@@ -1,0 +1,247 @@
+﻿<mah:MetroWindow x:Class="Editor_PCBasket___Mou.Views.EquipoWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:local="clr-namespace:Editor_PCBasket___Mou.Views"
+                 mc:Ignorable="d"
+                 WindowStartupLocation="CenterScreen"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:converters="clr-namespace:Editor_PCBasket___Mou.Converters"
+                 Title="Editar Equipo" Height="820" Width="1400">
+    <mah:MetroWindow.Resources>
+        <converters:DemarcacionConverter x:Key="DemarcacionConverter" />
+    </mah:MetroWindow.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="3.33*"/>
+            <ColumnDefinition Width="0"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <GroupBox Header="Datos del equipo"  Margin="5">
+            <StackPanel>
+                <TextBox Margin="5" materialDesign:HintAssist.Hint="Puntero"  Width="55"
+                         BorderBrush="{DynamicResource AccentColorBrush}"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                         Name="PunteroTextBox"
+                         HorizontalAlignment="Left"
+                         PreviewTextInput="NumberValidationTextBox"
+                         Text="{Binding Equipo.Puntero}" TextChanged="PunteroTextBoxTextChanged"/>
+                <TextBox Margin="5" Width="220" materialDesign:HintAssist.Hint="Nombre Corto" 
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                         HorizontalAlignment="Left"
+                         BorderBrush="{DynamicResource AccentColorBrush}"
+                         Text="{Binding Equipo.NombreCorto}"/>
+                <TextBox Margin="5" materialDesign:HintAssist.Hint="Nombre Largo" 
+                         HorizontalAlignment="Stretch"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                         BorderBrush="{DynamicResource AccentColorBrush}"
+                         Text="{Binding Equipo.NombreLargo}"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <ComboBox Margin="5"  materialDesign:HintAssist.Hint="País"      
+                              Name="NacionalidadComboBox"
+                              Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                              materialDesign:HintAssist.HintOpacity=".3"
+                              IsEditable="True"
+                              Width="220"
+                              ItemsSource="{Binding Source={StaticResource PaisesList}}"
+                              SelectedItem="{Binding Equipo.Pais}" SelectionChanged="ComboBox_SelectionChanged">
+                        <ComboBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ComboBox.ItemsPanel>
+                    </ComboBox>
+                    <Image Width="14" Height="10" Margin="5,10,2,10" VerticalAlignment="Bottom" Name="BanderaImage"/>
+                </StackPanel>
+                <TextBox Margin="5" Width="220" materialDesign:HintAssist.Hint="Entrenador" 
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                         HorizontalAlignment="Left"
+                         BorderBrush="{DynamicResource AccentColorBrush}"
+                         Text="{Binding Equipo.Entrenador}"/>
+                <TextBox Margin="5" Width="220" materialDesign:HintAssist.Hint="Pabellón" 
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                         HorizontalAlignment="Left"
+                         BorderBrush="{DynamicResource AccentColorBrush}"
+                         Text="{Binding Equipo.Pabellon}"/>
+                <TextBox Margin="5" Width="80" materialDesign:HintAssist.Hint="Aforo" 
+                         PreviewTextInput="NumberValidationTextBox"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                         HorizontalAlignment="Left"
+                         BorderBrush="{DynamicResource AccentColorBrush}"
+                         Text="{Binding Equipo.Aforo}"/>
+                <TextBox Margin="5" Width="80" materialDesign:HintAssist.Hint="Presupuesto" 
+                         PreviewTextInput="NumberValidationTextBox"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                         HorizontalAlignment="Left"
+                         BorderBrush="{DynamicResource AccentColorBrush}"
+                         Text="{Binding Equipo.Presupuesto}"/>
+                <GroupBox Header="Escudos" Margin="5">
+                    <StackPanel>
+                        <Label Content="3DESC" HorizontalAlignment="Center"/>
+                        <Border BorderBrush="{DynamicResource AccentColorBrush}" BorderThickness="1" Width="120" Height="120">
+                            <Image Name="Image3Desc" />
+                        </Border>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <Label Content="MINIESC" HorizontalAlignment="Center"/>
+                                <Border BorderBrush="{DynamicResource AccentColorBrush}" BorderThickness="1" Width="54" Height="70">
+                                    <Image Name="ImageMiniesc" />
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <Label Content="NANOESC" HorizontalAlignment="Center"/>
+                                <Border BorderBrush="{DynamicResource AccentColorBrush}" BorderThickness="1" Width="30" Height="30">
+                                    <Image Name="ImageNanoesc" />
+                                </Border>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <Label Content="RIDIESC" HorizontalAlignment="Center"/>
+                                <Border BorderBrush="{DynamicResource AccentColorBrush}" BorderThickness="1" Width="18" Height="18">
+                                    <Image Name="ImageRidiesc" />
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </GroupBox>
+
+        <GroupBox Grid.Column="1" Header="Plantilla" Margin="5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width=".05*"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <Border Height="49" BorderBrush="LightGray" BorderThickness="0,0,0,1">
+                        <Label Content="Pos" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="ExtraBlack"/>
+                    </Border>
+                    <Border Height="38" BorderBrush="LightGray" BorderThickness="0,0,0,1" Background="AntiqueWhite">
+                        <Label Content="B" VerticalAlignment="Center"  HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </Border>
+                    <Border Height="39" BorderBrush="LightGray" BorderThickness="0,0,0,1" Background="AntiqueWhite">
+                        <Label Content="E" VerticalAlignment="Center"  HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </Border>
+                    <Border Height="38" BorderBrush="LightGray" BorderThickness="0,0,0,1" Background="AntiqueWhite">
+                        <Label Content="A" VerticalAlignment="Center"  HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </Border>
+                    <Border Height="38" BorderBrush="LightGray" BorderThickness="0,0,0,1" Background="AntiqueWhite">
+                        <Label Content="AP" VerticalAlignment="Center"  HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </Border>
+                    <Border Height="38" BorderBrush="LightGray" BorderThickness="0,0,0,1" Background="AntiqueWhite">
+                        <Label Content="P" VerticalAlignment="Center"  HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </Border>
+                    <Border Height="39" BorderBrush="LightGray" BorderThickness="0,0,0,1" Background="LemonChiffon">
+                        <Label Content="6" VerticalAlignment="Center"  HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </Border>
+                    <Border Height="38" BorderBrush="LightGray" BorderThickness="0,0,0,1" Background="LemonChiffon">
+                        <Label Content="7" VerticalAlignment="Center"  HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </Border>
+                    <Border Height="38" BorderBrush="LightGray" BorderThickness="0,0,0,1" Background="LemonChiffon">
+                        <Label Content="8" VerticalAlignment="Center"  HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </Border>
+                    <Border Height="39" BorderBrush="LightGray" BorderThickness="0,0,0,1" Background="LemonChiffon">
+                        <Label Content="9" VerticalAlignment="Center"  HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </Border>
+                    <Border Height="38" BorderBrush="LightGray" BorderThickness="0,0,0,1" Background="LemonChiffon">
+                        <Label Content="10" VerticalAlignment="Center"  HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </Border>
+                    <Border Height="38" BorderBrush="LightGray" BorderThickness="0,0,0,1" Background="LemonChiffon">
+                        <Label Content="11" VerticalAlignment="Center"  HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </Border>
+                    <Border Height="38" BorderBrush="LightGray" BorderThickness="0,0,0,1" Background="LemonChiffon">
+                        <Label Content="12" VerticalAlignment="Center"  HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </Border>
+                    <Border Height="39" BorderBrush="LightGray" BorderThickness="0,0,0,1">
+                        <Label Content="13" VerticalAlignment="Center"  HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </Border>
+                    <Border Height="38" BorderBrush="LightGray" BorderThickness="0,0,0,1">
+                        <Label Content="14" VerticalAlignment="Center"  HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </Border>
+                    <Border Height="38" BorderBrush="LightGray" BorderThickness="0,0,0,1">
+                        <Label Content="15" VerticalAlignment="Center"  HorizontalAlignment="Center" FontWeight="Bold"/>
+                    </Border>
+                </StackPanel>
+                <DataGrid x:Name="PlantillaDataGrid"
+                          AutoGenerateColumns="False"
+                          Grid.Column="1"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"
+                          CanUserSortColumns="False"
+                          CanUserReorderColumns="False"
+                          CanUserDeleteRows="False"
+                          CanUserResizeColumns="False"
+                          HorizontalContentAlignment="Stretch"
+                          SelectionMode="Single"
+                          AllowDrop="True"
+                          PreviewMouseLeftButtonDown="PlantillaDataGrid_PreviewMouseLeftButtonDown"
+                          Drop="PlantillaDataGrid_Drop"
+                          ItemsSource="{Binding Equipo.Plantilla}">
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridRow">
+                            <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick"/>
+                        </Style>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Punt." Binding="{Binding Puntero}" Width="60"/>
+                        <DataGridTextColumn Header="Dorsal" Binding="{Binding Dorsal}" Width="67" />
+                        <DataGridTextColumn Header="Nombre Corto" Binding="{Binding NombreCorto}" />
+                        <DataGridTextColumn Header="Nombre Largo" Binding="{Binding NombreLargo}" />
+                        <DataGridTextColumn Header="Media (Q)" Binding="{Binding Medias.MediaQuinteto}" />
+                        <DataGridTextColumn Header="Media (P)" Binding="{Binding Medias.MediaPlantilla}" />
+                        <DataGridTextColumn Header="Pos." Binding="{Binding Demarcacion, Converter={StaticResource DemarcacionConverter}}" />
+                        <DataGridTextColumn Header="Altura" Binding="{Binding Altura}" />
+                        <DataGridTextColumn Header="Peso" Binding="{Binding Peso}" />
+                        <DataGridTextColumn Header="Nacionalidad" Binding="{Binding Nacionalidad}" />
+                        <DataGridTextColumn Header="Nac." Binding="{Binding AnoNacimiento}" />
+                        <DataGridComboBoxColumn Width="0" />
+                    </DataGrid.Columns>
+                </DataGrid>
+                <StackPanel Orientation="Horizontal" Grid.ColumnSpan="2" Grid.Row="1" Height="50" HorizontalAlignment="Center">
+                    <StackPanel Margin="10,0">
+                        <Grid Width="150">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width=".5*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="Media Quinteto: " VerticalAlignment="Center"/>
+                            <Label Grid.Column="1"  Content="{Binding Equipo.MediaQuinteto}" VerticalAlignment="Center" FontWeight="Bold"/>
+                        </Grid>
+                        <Grid Width="150">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width=".5*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Content="Media Plantilla: " VerticalAlignment="Center"/>
+                            <Label Grid.Column="1"  Content="{Binding Equipo.MediaPlantilla}" VerticalAlignment="Center" FontWeight="Bold"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <Button Content="+" Margin="2" Command="{Binding SubirMediaCommand}"/>
+                    <Button Content="-" Margin="2" Command="{Binding BajarMediaCommand}"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.ColumnSpan="3" HorizontalAlignment="Center" Margin="0,5">
+            <Button Content="Guardar" Margin="10,0" Command="{Binding SaveEquipoCommand}"/>
+            <Button Content="Generar DBC" Margin="10,0" Command="{Binding GenerateDbcCommand}" />
+        </StackPanel>
+
+    </Grid>
+</mah:MetroWindow>

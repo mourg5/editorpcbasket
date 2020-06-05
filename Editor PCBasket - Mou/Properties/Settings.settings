@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Editor_PCBasket___Mou.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Path" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\\Pc Basket 6.5\\</Value>
+    </Setting>
+    <Setting Name="AnoInicio" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1999</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
