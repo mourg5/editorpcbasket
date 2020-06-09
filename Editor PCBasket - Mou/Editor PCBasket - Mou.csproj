@@ -111,6 +111,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\DemarcacionConverter.cs" />
+    <Compile Include="Converters\PaisToBanderaConverter.cs" />
     <Compile Include="ViewModels\EquipoViewModel.cs" />
     <Compile Include="ViewModels\JugadorViewModel.cs" />
     <Compile Include="Views\EquipoWindow.xaml.cs">

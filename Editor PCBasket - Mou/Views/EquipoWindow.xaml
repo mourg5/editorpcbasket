@@ -12,6 +12,7 @@
                  Title="Editar Equipo" Height="820" Width="1400">
     <mah:MetroWindow.Resources>
         <converters:DemarcacionConverter x:Key="DemarcacionConverter" />
+        <converters:PaisToBanderaConverter x:Key="PaisToBanderaConverter"/>
     </mah:MetroWindow.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -208,7 +209,16 @@
                         <DataGridTextColumn Header="Pos." Binding="{Binding Demarcacion, Converter={StaticResource DemarcacionConverter}}" />
                         <DataGridTextColumn Header="Altura" Binding="{Binding Altura}" />
                         <DataGridTextColumn Header="Peso" Binding="{Binding Peso}" />
-                        <DataGridTextColumn Header="Nacionalidad" Binding="{Binding Nacionalidad}" />
+                        <DataGridTemplateColumn IsReadOnly="True" Header="Nacionalidad">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch" Height="18">
+                                        <Image Width="14" Height="10" Source="{Binding Nacionalidad, Converter={StaticResource PaisToBanderaConverter}}" />
+                                        <Label Content="{Binding Nacionalidad}" VerticalContentAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,-5"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                         <DataGridTextColumn Header="Nac." Binding="{Binding AnoNacimiento}" />
                         <DataGridComboBoxColumn Width="0" />
                     </DataGrid.Columns>

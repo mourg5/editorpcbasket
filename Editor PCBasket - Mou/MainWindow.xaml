@@ -8,10 +8,14 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:local="clr-namespace:Editor_PCBasket___Mou"
+                 xmlns:converters="clr-namespace:Editor_PCBasket___Mou.Converters"
                  mc:Ignorable="d"
                  WindowState="Maximized"
                  WindowStartupLocation="CenterScreen"
                  Title="Editor PCBasket - Mou" Height="1080" Width="1920">
+    <mah:MetroWindow.Resources>
+        <converters:PaisToBanderaConverter x:Key="PaisToBanderaConverter"/>
+    </mah:MetroWindow.Resources>
     <Grid>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -47,25 +51,45 @@
             </GroupBox>
 
             <Grid Grid.Row="1" Grid.ColumnSpan="2">
-                <ScrollViewer ScrollViewer.VerticalScrollBarVisibility="Visible">
-                    <DataGrid ItemsSource="{Binding EquiposList}" Name="EquiposDataGrid" 
-                              ScrollViewer.CanContentScroll="True" 
-                              ScrollViewer.VerticalScrollBarVisibility="Auto"
-                              ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                              IsReadOnly="True">
-                        <DataGrid.Resources>
-                            <Style TargetType="DataGridRow">
-                                <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick"/>
-                            </Style>
-                        </DataGrid.Resources>
-                        <DataGrid.CellStyle>
-                            <Style TargetType="DataGridCell">
-                                <Setter Property="BorderThickness" Value="0"/>
-                                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                            </Style>
-                        </DataGrid.CellStyle>
-                    </DataGrid>
-                </ScrollViewer>
+                <DataGrid ItemsSource="{Binding EquiposList}" Name="EquiposDataGrid" 
+                          Margin="20"
+                          ScrollViewer.CanContentScroll="True" 
+                          AutoGenerateColumns="False"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          IsReadOnly="True">
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridRow">
+                            <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick"/>
+                        </Style>
+                    </DataGrid.Resources>
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                        </Style>
+                    </DataGrid.CellStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Punt." Binding="{Binding Puntero}" Width="60"/>
+                        <DataGridTextColumn Header="Nombre Corto" Binding="{Binding NombreCorto}" />
+                        <DataGridTextColumn Header="Nombre Largo" Binding="{Binding NombreLargo}" />
+                        <DataGridTextColumn Header="Media (Q)" Binding="{Binding MediaQuinteto}" />
+                        <DataGridTextColumn Header="Media (P)" Binding="{Binding MediaPlantilla}" />
+                        <DataGridTemplateColumn Width="SizeToCells" IsReadOnly="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Width="14" Height="10" Source="{Binding Pais, Converter={StaticResource PaisToBanderaConverter}}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Pais" Binding="{Binding Pais}" />
+                        <DataGridTextColumn Header="Pabellon" Binding="{Binding Pabellon}" />
+                        <DataGridTextColumn Header="Aforo" Binding="{Binding Aforo}" />
+                        <DataGridTextColumn Header="Presupuesto" Binding="{Binding Presupuesto}" />
+                        <DataGridTextColumn Header="Entrenador" Binding="{Binding Entrenador}" />
+                        <DataGridComboBoxColumn Width="0" />
+                    </DataGrid.Columns>
+                </DataGrid>
             </Grid>
         </Grid>
     </Grid>
