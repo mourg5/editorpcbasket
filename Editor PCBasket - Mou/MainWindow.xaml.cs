@@ -5,6 +5,7 @@ using EpcbUtils;
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -46,15 +47,40 @@ namespace Editor_PCBasket___Mou
 			HexUtils.AnoInicio = (short)Settings.Default.AnoInicio;
 
 			DataContext = new MainViewModel();
+			LoadDataBase();
 		}
 
-		private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		private void LoadDataBase()
 		{
-			var equipo = EquiposDataGrid.SelectedItem as Equipo;
+			while (((MainViewModel)DataContext).Loading)
+			{
+				Thread.Sleep(250);
+			}
+
+			System.Windows.Data.CollectionViewSource jugadorViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("jugadorViewSource")));
+			jugadorViewSource.Source = DataBaseUtils.DataBase.Jugadores.Local;
+
+			System.Windows.Data.CollectionViewSource equipoViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("equipoViewSource")));
+			equipoViewSource.Source = DataBaseUtils.DataBase.Equipos.Local;
+		}
+
+		private void Equipos_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			var equipo = equipoDataGrid.SelectedItem as Equipo;
 			if (equipo != null)
 			{
 				var equipoWindow = new EquipoWindow(equipo);
 				equipoWindow.Show();
+			}
+		}
+
+		private void Jugadores_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			var jugador = jugadorDataGrid.SelectedItem as Jugador;
+			if (jugador != null)
+			{
+				var jugadorWindow = new JugadorWindow(jugador);
+				jugadorWindow.Show();
 			}
 		}
 
@@ -99,6 +125,23 @@ namespace Editor_PCBasket___Mou
 		{
 			Regex regex = new Regex("[^0-9]+");
 			e.Handled = regex.IsMatch(e.Text);
+		}
+
+		private void MetroWindow_Loaded(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void EquiposExpander_Expanded(object sender, RoutedEventArgs e)
+		{
+			if (JugadoresExpander != null)
+				JugadoresExpander.IsExpanded = false;
+		}
+
+		private void JugadoresExpander_Expanded(object sender, RoutedEventArgs e)
+		{
+			if (EquiposExpander != null)
+				EquiposExpander.IsExpanded = false;
 		}
 	}
 }

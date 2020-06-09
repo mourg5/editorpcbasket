@@ -12,7 +12,7 @@ namespace EpcbModel
 	{
 		public PcBasketContext() : base()
 		{
-			//Configuration.LazyLoadingEnabled = false;
+			Configuration.LazyLoadingEnabled = false;
 		}
 
 		public DbSet<Equipo> Equipos { get; set; }
