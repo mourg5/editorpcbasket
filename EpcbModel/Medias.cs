@@ -202,7 +202,7 @@ namespace EpcbModel
 		{
 			get
 			{
-				return (int)Math.Round(((Velocidad + Salto + Resistencia + Agresividad + Defensa + Oculto) * 13 / 7 + 100.0) / 14);
+				return (int)Math.Round(((Velocidad + Resistencia + Agresividad + Defensa + Rebotes + Asistencias + Oculto) * 13 / 7 + 100.0) / 14);
 			}
 		}
 
