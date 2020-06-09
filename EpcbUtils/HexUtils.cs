@@ -336,8 +336,8 @@ namespace EpcbUtils
 		}
 
 		public static void SaveEquipoBytes(Equipo equipo)
-		{
-			var teamFile = File.OpenWrite(DbdatUtils.PcbPath + "\\DBDAT\\EQ022022\\EQBA" + equipo.Puntero.ToString("0000") + ".DBC");
+		{	
+			var teamFile = File.OpenWrite(CheckPreviousDbc(equipo));
 
 			try
 			{
@@ -465,6 +465,28 @@ namespace EpcbUtils
 			file.WriteByte((byte)dummyText.Length);
 			file.WriteByte(0);
 			file.Write(DinamicEncoding.GetBytes(dummyText), 0, dummyText.Length);
+		}
+
+		public static string CheckPreviousDbc(Equipo equipo)
+		{
+			var filePath = DbdatUtils.PcbPath + "\\DBDAT\\EQ022022\\EQBA" + equipo.Puntero.ToString("0000") + ".DBC";
+
+			if (File.Exists(filePath))
+			{
+				var backupFolder = DbdatUtils.PcbPath + "\\DBDAT\\EQ022022\\Backup";
+				if (!Directory.Exists(backupFolder))
+				{
+					Directory.CreateDirectory(backupFolder);
+				}
+
+				var backupFile = backupFolder + "\\EQBA" + equipo.Puntero.ToString("0000") + "_" + DateTime.Now.Ticks + ".DBC";
+
+				File.Move(filePath, backupFile);
+
+				LoggerUtils.LogString(string.Format("El equipo {0} ya tenía DBC asociado. Se ha movido el archivo a la carpeta Backup", equipo.NombreCorto));
+			}
+
+			return filePath;
 		}
 	}
 }
