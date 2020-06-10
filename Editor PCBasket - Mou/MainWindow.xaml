@@ -25,6 +25,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height=".25*"/>
                 <RowDefinition/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <GroupBox Margin="5" Header="Configuración">
@@ -90,6 +91,10 @@
                         <DataGridComboBoxColumn Width="0" />
                     </DataGrid.Columns>
                 </DataGrid>
+            </Grid>
+
+            <Grid Grid.Row="2" Grid.ColumnSpan="2" Background="{DynamicResource AccentColorBrush}" Height="26">
+                <Label Content="{Binding StatusBarText}" Foreground="White" VerticalAlignment="Center" Margin="10,0"/>
             </Grid>
         </Grid>
     </Grid>

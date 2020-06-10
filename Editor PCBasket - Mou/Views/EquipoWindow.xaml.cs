@@ -143,17 +143,25 @@ namespace Editor_PCBasket___Mou.Views
 		{
 			var jugador = PlantillaDataGrid.SelectedItem as Jugador;
 
-			if (jugador != null)
-			{
-				var jugWindow = new JugadorWindow(jugador);
-				jugWindow.Closed += JugWindow_Closed;
-				jugWindow.Show();				
-			}
+			if (jugador == null) return;
+
+			var jugWindow = new JugadorWindow(jugador);
+			jugWindow.Closed += JugWindow_Closed;
+			jugWindow.Show();
 		}
 
 		private void JugWindow_Closed(object sender, EventArgs e)
 		{
 			((EquipoViewModel)DataContext).ReloadMedias();
+		}
+
+		private void DeleteJugadorClick(object sender, RoutedEventArgs e)
+		{
+			var jugador = PlantillaDataGrid.SelectedItem as Jugador;
+
+			if (jugador == null) return;
+
+			((EquipoViewModel)DataContext).DeleteJugador(jugador);
 		}
 	}
 }

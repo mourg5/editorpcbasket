@@ -7,7 +7,7 @@ using System.ComponentModel;
 namespace Editor_PCBasket___Mou.ViewModels
 {
 	public class EquipoViewModel : ViewModelBase, INotifyPropertyChanged
-	{		
+	{
 		public EquipoViewModel(Equipo equipo)
 		{
 			Equipo = equipo;
@@ -117,6 +117,20 @@ namespace Editor_PCBasket___Mou.ViewModels
 			}
 
 			ReloadMedias();
+		}
+
+		public void DeleteJugador(Jugador jug)
+		{
+			if (Equipo.Plantilla.Contains(jug))
+			{
+				Equipo.Plantilla.Remove(jug);
+				LoggerUtils.LogString(string.Format("El jugador {0} ha sido eliminado de {1}. Ahora aparece en jugadores libres.", jug.NombreLargo, Equipo.NombreCorto));
+			}
+		}
+
+		public void AddJugador(Jugador jug)
+		{
+			Equipo.Plantilla.Add(jug);
 		}
 
 		private bool CanExecuteBajarMedia()

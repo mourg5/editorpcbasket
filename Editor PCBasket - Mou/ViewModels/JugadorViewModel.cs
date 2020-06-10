@@ -10,16 +10,38 @@ namespace Editor_PCBasket___Mou.ViewModels
 {
 	public class JugadorViewModel : ViewModelBase
 	{
-		DinamicEncoding DinamicEncoding = new DinamicEncoding();
-
 		public JugadorViewModel(Jugador jugador)
 		{
 			Jugador = jugador;
 
 			MediaDeseada = 70;
 			_random = new Random(DateTime.Now.Millisecond);
+			NombreEquipo = "Libre";
+
+			var equipo = DataBaseUtils.DataBase.GetEquipoOfJugador(jugador);
+
+			if (equipo == null) return;
+
+			NombreEquipo = equipo.NombreLargo;
+			EscudoImageSource = DbdatUtils.GetNanoesc(equipo.Puntero);
 		}
-		
+
+		private string _nombreEquipo;
+
+		public string NombreEquipo
+		{
+			get { return _nombreEquipo; }
+			set { Set(() => NombreEquipo, ref _nombreEquipo, value); }
+		}
+
+		private BitmapImage _escudoImageSource;
+
+		public BitmapImage EscudoImageSource
+		{
+			get { return _escudoImageSource; }
+			set { Set(() => EscudoImageSource, ref _escudoImageSource, value); }
+		}
+
 		private Jugador _jugador;
 		public Jugador Jugador
 		{

@@ -28,6 +28,8 @@ namespace Editor_PCBasket___Mou.Views
 		}
 		private void ComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
 		{
+			if (NacionalidadComboBox.SelectedItem == null) return;
+
 			BanderaImage.Source = DbdatUtils.GetBanderaBitmap((Pais)NacionalidadComboBox.SelectedItem);
 		}
 

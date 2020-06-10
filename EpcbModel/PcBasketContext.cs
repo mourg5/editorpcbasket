@@ -23,6 +23,11 @@ namespace EpcbModel
 			return Equipos.Where(e => e.Puntero == puntero).FirstOrDefault();
 		}
 
+		public Equipo GetEquipoOfJugador(Jugador jug)
+		{			
+			return Equipos.Where(e => e.Plantilla.Any(j => j.Puntero == jug.Puntero)).FirstOrDefault();
+		}
+
 		public ObservableCollection<Jugador> GetPlantillaOfEquipo(int punteroEquipo)
 		{
 			var lista = Jugadores.SqlQuery("SELECT * WHERE Equipo_EquipoId = " + punteroEquipo).ToList();

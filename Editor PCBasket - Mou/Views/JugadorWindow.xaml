@@ -1,15 +1,16 @@
 ﻿<mah:MetroWindow x:Class="Editor_PCBasket___Mou.Views.JugadorWindow"
-                xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                xmlns:System="clr-namespace:System;assembly=mscorlib"
-                xmlns:local="clr-namespace:Editor_PCBasket___Mou.Views"
-                xmlns:model="clr-namespace:EpcbModel;assembly=EpcbModel"
-                mc:Ignorable="d"
-                Title="Editar Jugador" Height="580" Width="720"> 
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:System="clr-namespace:System;assembly=mscorlib"
+                 xmlns:local="clr-namespace:Editor_PCBasket___Mou.Views"
+                 xmlns:model="clr-namespace:EpcbModel;assembly=EpcbModel"
+                 mc:Ignorable="d"
+                 WindowStartupLocation="CenterScreen"
+                 Title="Editar Jugador" Height="580" Width="720">
     <mah:MetroWindow.Resources>
         <Style x:Key="SliderStyle" TargetType="Slider" BasedOn="{StaticResource MaterialDesignSlider}">
             <Setter Property="Maximum" Value="99" />
@@ -44,11 +45,13 @@
             </StackPanel>
             <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height=".1*" />
                     <RowDefinition Height=".4*" />
                     <RowDefinition Height=".1*" />
                 </Grid.RowDefinitions>
-                <StackPanel Orientation="Horizontal" Margin="10,0">
+
+                <StackPanel Orientation="Horizontal" Margin="10,0" Grid.Row="1">
                     <TextBox Margin="5,2" Width="87" materialDesign:HintAssist.Hint="Año Nacimiento" 
                              Style="{StaticResource MaterialDesignFloatingHintTextBox}" VerticalAlignment="Center"
                              PreviewTextInput="NumberValidationTextBox"
@@ -109,7 +112,7 @@
                     <Label Content="Negro" VerticalAlignment="Center"/>
                 </StackPanel>
                 <!-- MEDIAS -->
-                <Grid Grid.Row="1" Margin="10">
+                <Grid Grid.Row="2" Margin="10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1.5*"/>
                         <ColumnDefinition/>
@@ -290,40 +293,48 @@
                         </StackPanel>
                     </Grid>
                     <Grid Grid.Column="1">
-                        <materialDesign:Card Background="{DynamicResource MaterialDesignBackground}">
-                            <Expander HorizontalAlignment="Stretch"
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="10,0">
+                                <Border BorderBrush="Gray" BorderThickness="1">
+                                    <Image Source="{Binding EscudoImageSource}" Height="30" Width="30"/>
+                                </Border>
+                                <Label Content="{Binding NombreEquipo}" VerticalAlignment="Center" FontWeight="Bold"/>
+                            </StackPanel>
+                            <materialDesign:Card Background="{DynamicResource MaterialDesignBackground}" Margin="10">
+                                <Expander HorizontalAlignment="Stretch"
                                   Header="Generar Media">
-                                <Grid Margin="24,0,24,16">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                    </Grid.RowDefinitions>
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                        <Label Content="Media deseada (quinteto): "/>
-                                        <TextBox Text="{Binding MediaDeseada}" Width="25" HorizontalContentAlignment="Center" PreviewTextInput="NumberValidationTextBox"/>
-                                    </StackPanel>
+                                    <Grid Margin="24,0,24,16">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                            <Label Content="Media deseada (quinteto): "/>
+                                            <TextBox Text="{Binding MediaDeseada}" Width="25" HorizontalContentAlignment="Center" PreviewTextInput="NumberValidationTextBox"/>
+                                        </StackPanel>
 
-                                    <CheckBox IsChecked="{Binding Jugador.IsVeloz}" Style="{StaticResource MaterialDesignCheckBox}" Content="Veloz" Grid.Row="1" />
-                                    <CheckBox IsChecked="{Binding Jugador.IsAtletico}" Style="{StaticResource MaterialDesignCheckBox}" Content="Atlético" Grid.Row="2" />
-                                    <CheckBox IsChecked="{Binding Jugador.IsIntimidador}" Style="{StaticResource MaterialDesignCheckBox}" Content="Intimidador" Grid.Row="3" />
-                                    <CheckBox IsChecked="{Binding Jugador.IsTirador}" Style="{StaticResource MaterialDesignCheckBox}" Content="Tirador" Grid.Row="4" />
-                                    <CheckBox IsChecked="{Binding Jugador.IsCreador}" Style="{StaticResource MaterialDesignCheckBox}" Content="Creador de juego" Grid.Row="5" />
-                                    <CheckBox IsChecked="{Binding Jugador.IsDefensor}" Style="{StaticResource MaterialDesignCheckBox}" Content="Defensor" Grid.Row="6" />
+                                        <CheckBox IsChecked="{Binding Jugador.IsVeloz}" Style="{StaticResource MaterialDesignCheckBox}" Content="Veloz" Grid.Row="1" />
+                                        <CheckBox IsChecked="{Binding Jugador.IsAtletico}" Style="{StaticResource MaterialDesignCheckBox}" Content="Atlético" Grid.Row="2" />
+                                        <CheckBox IsChecked="{Binding Jugador.IsIntimidador}" Style="{StaticResource MaterialDesignCheckBox}" Content="Intimidador" Grid.Row="3" />
+                                        <CheckBox IsChecked="{Binding Jugador.IsTirador}" Style="{StaticResource MaterialDesignCheckBox}" Content="Tirador" Grid.Row="4" />
+                                        <CheckBox IsChecked="{Binding Jugador.IsCreador}" Style="{StaticResource MaterialDesignCheckBox}" Content="Creador de juego" Grid.Row="5" />
+                                        <CheckBox IsChecked="{Binding Jugador.IsDefensor}" Style="{StaticResource MaterialDesignCheckBox}" Content="Defensor" Grid.Row="6" />
 
-                                    <Button Command="{Binding GenerarMediaCommand}" Content="Generar" Grid.Row="7" HorizontalAlignment="Center" Margin="2,10,2,0"/>
+                                        <Button Command="{Binding GenerarMediaCommand}" Content="Generar" Grid.Row="7" HorizontalAlignment="Center" Margin="2,10,2,0"/>
 
-                                </Grid>
-                            </Expander>
-                        </materialDesign:Card>
+                                    </Grid>
+                                </Expander>
+                            </materialDesign:Card>
+                        </StackPanel>
                     </Grid>
                 </Grid>
-                <Button Grid.Row="2" HorizontalAlignment="Center" Content="Guardar" Command="{Binding GuardarCommand}" IsEnabled="False"/>
+                <Button Grid.Row="3" HorizontalAlignment="Center" Content="Guardar" Command="{Binding GuardarCommand}" IsEnabled="False"/>
             </Grid>
         </StackPanel>
     </Grid>
