@@ -5,12 +5,16 @@ using EpcbUtils.Messages;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using GalaSoft.MvvmLight.Threading;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace Editor_PCBasket___Mou
 {
@@ -38,7 +42,11 @@ namespace Editor_PCBasket___Mou
 
 		private void ProcessStatusMessage(StatusMessage obj)
 		{
-			StatusBarText = obj.Message;
+			DispatcherHelper.CheckBeginInvokeOnUI(() =>
+			{
+				StatusBarText = obj.Message;
+			});
+
 			_statusBarTimer.Start();
 		}
 
@@ -71,12 +79,16 @@ namespace Editor_PCBasket___Mou
 			set { Set(() => StatusBarText, ref _statusBarText, value); }
 		}
 
-		private void ExecuteCreateDatabase()
+		private async void ExecuteCreateDatabase()
 		{
 			LoggerUtils.LogString("Generando base de datos desde EQ022022...");
-			DataBaseUtils.CreateInitialDataBase();
+			EquiposList.Clear();
+			_statusBarTimer.Stop();
+
+			await Task.Run(() => DataBaseUtils.CreateInitialDataBase());
+
 			ReloadEquiposList();
-			if(EquiposList.Any()) LoggerUtils.LogString("Base de datos generada correctamente. Importados " + EquiposList.Count + " equipos.");
+			if (EquiposList.Any()) LoggerUtils.LogString("Base de datos generada correctamente. Importados " + EquiposList.Count + " equipos.");
 		}
 
 		private bool CanExecuteCreateDatabase()

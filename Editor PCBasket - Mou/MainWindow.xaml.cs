@@ -2,6 +2,7 @@
 using Editor_PCBasket___Mou.Views;
 using EpcbModel;
 using EpcbUtils;
+using GalaSoft.MvvmLight.Threading;
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -44,6 +45,8 @@ namespace Editor_PCBasket___Mou
 			RutaTextBox.Text = Settings.Default.Path;
 			DbdatUtils.PcbPath = Settings.Default.Path;
 			HexUtils.AnoInicio = (short)Settings.Default.AnoInicio;
+
+			DispatcherHelper.Initialize();
 
 			DataContext = new MainViewModel();
 		}
