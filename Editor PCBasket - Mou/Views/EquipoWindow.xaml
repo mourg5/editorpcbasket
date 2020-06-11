@@ -253,7 +253,7 @@
                             <materialDesign:PackIcon Kind="AccountOff" Width="20" Height="20"/>
                         </Button.Content>
                     </Button>
-                    <Button Command="{Binding AddJugadorCommand}" Margin="2,0" ToolTip="Añadir jugador libre" IsEnabled="False">
+                    <Button Click="AddJugadorClick"  Margin="2,0" ToolTip="Añadir jugador">
                         <Button.Content>
                             <materialDesign:PackIcon Kind="AccountPlus" Width="20" Height="20"/>
                         </Button.Content>

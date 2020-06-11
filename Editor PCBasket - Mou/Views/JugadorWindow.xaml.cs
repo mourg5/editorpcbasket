@@ -20,6 +20,7 @@ namespace Editor_PCBasket___Mou.Views
 		public JugadorWindow()
 		{
 			InitializeComponent();
+			DataContext = new JugadorViewModel();
 		}
 		private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
 		{
@@ -38,6 +39,17 @@ namespace Editor_PCBasket___Mou.Views
 			if (string.IsNullOrEmpty(PunteroTextBox.Text)) return;
 
 			FotoImage.Source = DbdatUtils.GetMedfoto(int.Parse(PunteroTextBox.Text));
+		}
+
+		private void AceptarClick(object sender, System.Windows.RoutedEventArgs e)
+		{
+			((JugadorViewModel)DataContext).ApplyChanges = true;
+			this.Close();
+		}
+
+		private void CancelarClick(object sender, System.Windows.RoutedEventArgs e)
+		{
+			this.Close();
 		}
 	}
 }

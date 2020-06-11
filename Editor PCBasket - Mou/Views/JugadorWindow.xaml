@@ -334,7 +334,10 @@
                         </StackPanel>
                     </Grid>
                 </Grid>
-                <Button Grid.Row="3" HorizontalAlignment="Center" Content="Guardar" Command="{Binding GuardarCommand}" IsEnabled="False"/>
+                <StackPanel x:Name="ButtonsStackPanel" Orientation="Horizontal" Grid.Row="3" HorizontalAlignment="Center" Visibility="Collapsed">
+                    <Button Click="AceptarClick" Content="Aceptar" Command="{Binding GuardarCommand}" Margin="4,0"/>
+                    <Button Click="CancelarClick" Content="Cancelar" Command="{Binding GuardarCommand}" Margin="4,0"/>
+                </StackPanel>
             </Grid>
         </StackPanel>
     </Grid>

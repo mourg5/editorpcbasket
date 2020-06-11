@@ -10,6 +10,13 @@ namespace Editor_PCBasket___Mou.ViewModels
 {
 	public class JugadorViewModel : ViewModelBase
 	{
+		public JugadorViewModel()
+		{
+			Jugador = new Jugador();
+			MediaDeseada = 70;
+			Jugador.Nacionalidad = Pais.LUXEMBURGO;
+			_random = new Random(DateTime.Now.Millisecond);
+		}
 		public JugadorViewModel(Jugador jugador)
 		{
 			Jugador = jugador;
@@ -25,6 +32,8 @@ namespace Editor_PCBasket___Mou.ViewModels
 			NombreEquipo = equipo.NombreLargo;
 			EscudoImageSource = DbdatUtils.GetNanoesc(equipo.Puntero);
 		}
+
+		public bool ApplyChanges = false;
 
 		private string _nombreEquipo;
 
@@ -397,29 +406,5 @@ namespace Editor_PCBasket___Mou.ViewModels
 		private Random _random;
 
 		#endregion
-
-		private RelayCommand _guardarCommand;
-
-		public RelayCommand GuardarCommand
-		{
-			get
-			{
-				if (_guardarCommand == null)
-				{
-					_guardarCommand = new RelayCommand(ExecuteGuardar, CanExecuteGuardar);
-				}
-				return _guardarCommand;
-			}
-		}
-
-		private void ExecuteGuardar()
-		{
-		}
-
-		private bool CanExecuteGuardar()
-		{
-			//TODO: Implement condition
-			return true;
-		}
 	}
 }

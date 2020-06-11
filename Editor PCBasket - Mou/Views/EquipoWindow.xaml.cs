@@ -163,5 +163,30 @@ namespace Editor_PCBasket___Mou.Views
 
 			((EquipoViewModel)DataContext).DeleteJugador(jugador);
 		}
+
+		private void AddJugadorClick(object sender, RoutedEventArgs e)
+		{
+			if (((EquipoViewModel)DataContext).Equipo.Plantilla.Count > 14)
+			{
+				MessageBox.Show("El equipo ya tiene el número máximo de jugadores en plantilla.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+				e.Handled = true;
+				return;
+			}
+
+			var jugW = new JugadorWindow();
+			jugW.Closing += JugW_Closing;
+			jugW.ButtonsStackPanel.Visibility = Visibility.Visible;
+			jugW.Show();
+		}
+
+		private void JugW_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+		{
+			var jugVM = ((JugadorWindow)sender).DataContext as JugadorViewModel;
+
+			if (jugVM == null || !jugVM.ApplyChanges) return;
+
+			((EquipoViewModel)DataContext).Equipo.Plantilla.Add(jugVM.Jugador);
+			LoggerUtils.LogString(string.Format("El jugador {0} se ha añadido a la plantilla de {1}", jugVM.Jugador.NombreLargo, ((EquipoViewModel)DataContext).Equipo.NombreCorto));
+		}
 	}
 }
