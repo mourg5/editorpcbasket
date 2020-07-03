@@ -1,17 +1,13 @@
-﻿using Editor_PCBasket___Mou.Properties;
-using EpcbModel;
+﻿using EpcbModel;
 using EpcbUtils;
 using EpcbUtils.Messages;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using GalaSoft.MvvmLight.Threading;
-using System;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Timer = System.Timers.Timer;
@@ -24,6 +20,7 @@ namespace Editor_PCBasket___Mou
 		{
 			LoggerUtils.LogString(string.Format("============= Iniciando Editor PCBasket. Versión {0}=============", Assembly.GetExecutingAssembly().GetName().Version));
 			ReloadEquiposList();
+			//ReloadJugadoresList();
 			Messenger.Default.Register<StatusMessage>(this, ProcessStatusMessage);
 			_statusBarTimer = new Timer()
 			{
@@ -55,6 +52,13 @@ namespace Editor_PCBasket___Mou
 		{
 			get { return _equiposList; }
 			set { Set(() => EquiposList, ref _equiposList, value); }
+		}
+
+		private ObservableCollection<Jugador> _jugadoresList;
+		public ObservableCollection<Jugador> JugadoresList
+		{
+			get { return _jugadoresList; }
+			set { Set(() => JugadoresList, ref _jugadoresList, value); }
 		}
 
 		private RelayCommand _createDatabaseCommand;
@@ -99,12 +103,14 @@ namespace Editor_PCBasket___Mou
 
 		private void ReloadEquiposList()
 		{
-			EquiposList = new ObservableCollection<Equipo>();
 			var lista = DataBaseUtils.DataBase.Equipos.Include("Plantilla").Where(e => e.Puntero > 0).ToList();
-			foreach (var equipo in lista)
-			{
-				EquiposList.Add(equipo);
-			}
+			EquiposList = new ObservableCollection<Equipo>(lista);
+		}
+
+		private void ReloadJugadoresList()
+		{
+			var listaJ = DataBaseUtils.DataBase.Jugadores.ToList();
+			JugadoresList = new ObservableCollection<Jugador>(listaJ);
 		}
 	}
 }

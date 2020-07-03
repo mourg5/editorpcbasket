@@ -166,7 +166,7 @@ namespace Editor_PCBasket___Mou.Views
 
 		private void AddJugadorClick(object sender, RoutedEventArgs e)
 		{
-			if (((EquipoViewModel)DataContext).Equipo.Plantilla.Count > 14)
+			if (((EquipoViewModel)DataContext).Equipo.Plantilla.Count > 14 && ((EquipoViewModel)DataContext).Equipo.Puntero < 9000)
 			{
 				MessageBox.Show("El equipo ya tiene el número máximo de jugadores en plantilla.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
 				e.Handled = true;
