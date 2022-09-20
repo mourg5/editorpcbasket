@@ -22,25 +22,18 @@ namespace EpcbUtils
 				Puntero = pEquipo
 			};
 
-			var eqInfo = doc.DocumentNode.SelectSingleNode("//div[@class='home-team__content__card-identity__description']");
-
-			var nombreEquipo = eqInfo.SelectSingleNode("h3").InnerText;
+			var nombreEquipo = doc.DocumentNode.SelectSingleNode("//div[@class='identity__picture']").SelectSingleNode("img").Attributes["alt"].Value;
 
 			equipoRes.NombreCorto = nombreEquipo;
 			equipoRes.NombreLargo = nombreEquipo;
 
-			var pNodes = eqInfo.SelectSingleNode("//div[@class='home-team__content__card-identity__description__infos']");
+			var hPais = doc.DocumentNode.SelectSingleNode("//a[@class='breadcrumb-link']").Attributes["title"].Value;
 
-			var paisString = pNodes.SelectNodes("//p")[1].SelectNodes("//span")[3].InnerText;
-			if (paisString.Contains(','))
-			{
-				paisString = paisString.Substring(0, paisString.IndexOf(','));
-			}
-
-			var pais = CountryToPais(paisString);
+			var pais = CountryToPais(hPais);
 
 			equipoRes.Pais = pais;
 
+			var eqInfo = doc.DocumentNode.SelectSingleNode("//div[@class='table__inner']");
 			var plantilla = eqInfo.SelectSingleNode("//table[@class='table']").SelectSingleNode("//tbody");
 
 			var punteroJug = pJugador;
@@ -51,9 +44,12 @@ namespace EpcbUtils
 				var jugNode = jugador.Descendants().ElementAt(3);
 				var nombre = jugNode.InnerText;
 
-				if (nombre.StartsWith("\n")) continue;
+				if (nombre.StartsWith("\n") && nombre.Length < 23) continue;
 
-				var urlJug = jugNode.ParentNode.Attributes[1].Value;
+				nombre = nombre.Replace("\n", "");
+				nombre = nombre.Replace("  ", "");
+
+				var urlJug = jugNode.ParentNode.ChildNodes[1].Attributes[1].Value;
 
 				try
 				{
@@ -81,10 +77,8 @@ namespace EpcbUtils
 			var web = new HtmlWeb();
 			var doc = web.Load("https://www.proballers.com" + url);
 
-			var eqInfo = doc.DocumentNode.SelectSingleNode("//div[@class='home-player__card-identity__profil__card__infos']");
-
 			// Nombre
-			var nombre = eqInfo.SelectSingleNode("h3").InnerText.Replace("\n                                        ", "").Replace("\n                                   ", "");
+			var nombre = doc.DocumentNode.SelectSingleNode("//div[@class='identity__picture']").SelectSingleNode("img").Attributes["alt"].Value;
 
 			var apellido = nombre.Substring(nombre.IndexOf(' ') + 1, nombre.Length - nombre.IndexOf(' ') - 2);
 			var nom = nombre.Substring(0, nombre.IndexOf(' '));
@@ -92,11 +86,13 @@ namespace EpcbUtils
 			jugPlantilla.NombreCorto = apellido.ToUpper();
 			jugPlantilla.NombreLargo = nom + " " + apellido.ToUpper();
 
+			var infoJug = doc.DocumentNode.SelectSingleNode("//div[@class='identity__description']").ChildNodes["ul"];
+
 			// Fecha nacimiento
 			try
 			{
-				var birth = eqInfo.SelectSingleNode("//p[@itemprop='birthDate']").Descendants().ElementAt(3).InnerText.Replace("\n                                    ", "");
-				var fnac = birth.Substring(birth.Length - 4);
+				var birth = infoJug.ChildNodes.ElementAt(1).InnerText;
+				var fnac = birth.Substring(birth.IndexOf(",") + 2, 4);
 
 				jugPlantilla.AnoNacimiento = int.Parse(fnac);
 			}
@@ -108,7 +104,7 @@ namespace EpcbUtils
 			// Altura y peso 
 			try
 			{
-				var height = eqInfo.SelectSingleNode("//p[@itemprop='height']").Descendants().ElementAt(3).InnerText.TrimStart(' ');
+				var height = infoJug.ChildNodes.ElementAt(5).InnerText;
 				var alt = height.Substring(0, 4).Replace("m", "");
 
 				jugPlantilla.Altura = int.Parse(alt);
@@ -123,7 +119,7 @@ namespace EpcbUtils
 			// Nacionalidad
 			try
 			{
-				var nacionalidad = eqInfo.SelectSingleNode("//p[@itemprop='nationality']").Descendants().ElementAt(3).InnerText.Replace("\n                                        ", "").Replace("\n                                    ","");
+				var nacionalidad = infoJug.ChildNodes.ElementAt(3).InnerText;
 				jugPlantilla.Nacionalidad = NationalityToPais(nacionalidad);
 			}
 			catch (Exception)
@@ -134,14 +130,14 @@ namespace EpcbUtils
 			// Posición
 			try
 			{
-				var pos = eqInfo.SelectNodes("//p").ElementAt(2).Descendants().ElementAt(3).InnerText.TrimStart(' ');
+				var pos = infoJug.ChildNodes.ElementAt(7).InnerText;
 				jugPlantilla.Demarcacion = StringToPosition(pos);
 			}
 			catch (Exception)
 			{
 				jugPlantilla.Demarcacion = 2;
 			}
-			
+
 			// Dorsal
 			jugPlantilla.Dorsal = _dorsales[_i];
 			_i++;
@@ -288,7 +284,7 @@ namespace EpcbUtils
 			{"Brazilian", 10},
 			{"Bulgarian", 11},
 			{"Belgian", 12},
-			{"Cameroon", 13},
+			{"Cameroonian", 13},
 			{"Chile", 14},
 			{"Cyprus", 15},
 			{"Colombian", 16},
@@ -302,7 +298,7 @@ namespace EpcbUtils
 			{"French", 24},
 			{"Ghanaian", 25},
 			{"Greek", 26 },
-			{"Netherlands", 27},
+			{"Dutch", 27},
 			{"Honduras", 28},
 			{"Hungary", 29},
 			{"United-Kingdom", 30},
@@ -489,8 +485,6 @@ namespace EpcbUtils
 			{"Vanuatu", 206},
 		};
 
-
-		// ANTIGUO DICCIONARIO, las nacionalidades venían como país
 		private static readonly Dictionary<string, int> CountryCodes = new Dictionary<string, int>()
 		{
 			{"Albania", 1},
