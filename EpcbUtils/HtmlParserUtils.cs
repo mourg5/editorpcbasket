@@ -80,7 +80,7 @@ namespace EpcbUtils
 			// Nombre
 			var nombre = doc.DocumentNode.SelectSingleNode("//div[@class='identity__picture']").SelectSingleNode("img").Attributes["alt"].Value;
 
-			var apellido = nombre.Substring(nombre.IndexOf(' ') + 1, nombre.Length - nombre.IndexOf(' ') - 2);
+			var apellido = nombre.Substring(nombre.IndexOf(' ') + 1);
 			var nom = nombre.Substring(0, nombre.IndexOf(' '));
 
 			jugPlantilla.NombreCorto = apellido.ToUpper();
@@ -121,6 +121,11 @@ namespace EpcbUtils
 			{
 				var nacionalidad = infoJug.ChildNodes.ElementAt(3).InnerText;
 				jugPlantilla.Nacionalidad = NationalityToPais(nacionalidad);
+
+				if (jugPlantilla.Nacionalidad == Pais.IRLANDA_DEL_NORTE)
+				{
+					jugPlantilla.ColorPiel = true;
+				}
 			}
 			catch (Exception)
 			{

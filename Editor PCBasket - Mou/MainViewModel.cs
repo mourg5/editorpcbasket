@@ -18,7 +18,7 @@ namespace Editor_PCBasket___Mou
 	{
 		public MainViewModel()
 		{
-			LoggerUtils.LogString(string.Format("============= Iniciando Editor PCBasket. Versión {0}=============", Assembly.GetExecutingAssembly().GetName().Version));
+			LoggerUtils.LogString(string.Format("============= Iniciando Editor PCBasket. Versión {0} =============", Assembly.GetExecutingAssembly().GetName().Version));
 			ReloadEquiposList();
 			//ReloadJugadoresList();
 			Messenger.Default.Register<StatusMessage>(this, ProcessStatusMessage);
