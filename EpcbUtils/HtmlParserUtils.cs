@@ -78,7 +78,7 @@ namespace EpcbUtils
 			var doc = web.Load("https://www.proballers.com" + url);
 
 			// Nombre
-			var nombre = doc.DocumentNode.SelectSingleNode("//div[@class='identity__picture']").SelectSingleNode("img").Attributes["alt"].Value;
+			var nombre = doc.DocumentNode.SelectSingleNode("//div[@class='identity__picture identity__picture--player']").SelectSingleNode("img").Attributes["alt"].Value;
 
 			var apellido = nombre.Substring(nombre.IndexOf(' ') + 1);
 			var nom = nombre.Substring(0, nombre.IndexOf(' '));
