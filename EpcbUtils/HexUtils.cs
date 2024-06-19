@@ -1,16 +1,17 @@
 ﻿using EpcbModel;
+using KGySoft.CoreLibraries;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace EpcbUtils
 {
 	public static class HexUtils
 	{
 		static DinamicEncoding DinamicEncoding = new DinamicEncoding();
+		private static Random _random = new Random(DateTime.Now.Millisecond);
 
 		public static short AnoInicio { get; set; }
 
@@ -205,7 +206,7 @@ namespace EpcbUtils
 				teamFile.Read(bytesEntrenador, 0, longEntrenador);
 
 				newEquipo.Entrenador = DinamicEncoding.GetString(bytesEntrenador);
-				
+
 				// PLANTILLA
 				var jugador = new Jugador();
 
@@ -269,7 +270,7 @@ namespace EpcbUtils
 				// Demarcación
 				newJugador.Demarcacion = playerFile.ReadByte() - 1;
 
-				//TODO: ???
+				// Tácticas ataque
 				SkipBytes(playerFile, 8);
 
 				// Nacionalidad
@@ -449,7 +450,7 @@ namespace EpcbUtils
 			playerFile.WriteByte((byte)(jugador.Demarcacion + 1));
 
 			// Tácticas ataque
-			var ata = DinamicEncoding.GetBytes("cebgdcda");
+			var ata = GetTacticaAtaqueBytes(jugador.Demarcacion);
 			playerFile.Write(ata, 0, ata.Length);
 
 			// Nacionalidad
@@ -502,6 +503,40 @@ namespace EpcbUtils
 			playerFile.WriteByte((byte)jugador.Medias.TiroL);
 			playerFile.WriteByte((byte)jugador.Medias.Rebotes);
 			playerFile.WriteByte((byte)jugador.Medias.Asistencias);
+		}
+
+		private static List<string[]> _tacticas = new List<string[]>
+		{
+			// BASE
+			new string[] { "bbdeceag", "bbdedd\'d", "bcad\'bdd", "cedbdgcg", "bbdecd\'b", "bb\'deggd", "ebde\'d\'b", "ebddbe\'e",
+				"\'deddegg", "dedgbe\'d", "bbddce\'g", "bbbedegg", "ebddceag", "be\'daggd", "ebdegdgg", "bbdegg\'d", "cdbbdeae",
+				"cbdbgd\'d", "bbad\'eeb", "ce\'deedd", "bb\'edbdg", "bbdedgag", "bbbededd", "bbdbgdbe" },
+			// ESCOLTA
+			new string[] { "dbaeagcg", "degg\'gce", "bbce\'ddd", "'dcedegg", "deggce\'e", "dedgceag", "ebgd\'dae", "ebdedg\'d",
+				"dbcbadgg", "eeddcdag", "ceegdbad", "cgbceegd", "cb\'ebede", "ceagebge" }, 
+			// ALERO
+			new string[] { "ebdeegad", "deggcg\'e", "'degbbdd", "\'dbedgdb", "db\'ecggd", "deggce\'g", "ebdegg\'b", "\'ecgegbb",
+				"dedgag\'d", "ceag\'geg", "\'e\'gegde", "deceageg", "dbgd\'eag", "\'eagegge", "bgeecbae", "ce\'gggdd", "ad\'gce\'b",
+				"edbebgcg", "ce\'dagbb", "eedgcgcb" }, 
+			// ALA-PIVOT
+			new string[] { "cgbdbeed", "ceeeegcg", "\'dbdegcg", "cdbedeeg", "cdegbeeb", "eeeg\'dbd", "cbadggee", "eecdegbb",
+				"cdeeegbe", "egcgbd\'d", "bdbgeece", "edcdbgbe", "egcdbbdb", "eeddegce", "edbgbece", "cdbeedeg", "ceeebdgd" }, 
+			// PIVOT
+			new string[] { "cebgegde", "egbgedcd", "bgbdcgeg", "cgegbeee", "egbdcdcg" , "bdcgeged", "cdbgbdeg", "bgedcgbd",
+				"cdcgbged", "cgbdegeb", "cgbeegeb", "cgedegcb", "cgbeed\'e", "cgbdbgeg", "edbdbgeg", "bgcgbded", "edbgcdcg",
+				"bdcdcgeg", "bgeecged", "bgegbdcg", "bdbgegcd", "bgcdegbe", "bgbeceed" },
+		};
+
+		private static byte[] GetTacticaAtaqueBytes(int posicion)
+		{
+			string tactica;
+
+			do
+			{
+				tactica = _tacticas[posicion].ElementAt(_random.NextInt16((short)(_tacticas[posicion].Length - 1)));
+			} while (tactica.Length != 8);
+
+			return DinamicEncoding.GetBytes(tactica);
 		}
 
 		public static void SaveEquipoBytes(Equipo equipo)
@@ -719,7 +754,7 @@ namespace EpcbUtils
 			playerFile.WriteByte((byte)(jugador.Demarcacion + 1));
 
 			// Tácticas ataque
-			var ata = DinamicEncoding.GetBytes("cebgdcda");
+			var ata = GetTacticaAtaqueBytes(jugador.Demarcacion);
 			playerFile.Write(ata, 0, ata.Length);
 
 			// Nacionalidad
