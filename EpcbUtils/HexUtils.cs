@@ -374,7 +374,7 @@ namespace EpcbUtils
 				// Demarcación
 				newJugador.Demarcacion = playerFile.ReadByte() - 1;
 
-				//TODO: ???
+				// TODO: Tacticas ataque
 				SkipBytes(playerFile, 8);
 
 				// Nacionalidad

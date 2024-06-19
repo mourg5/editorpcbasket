@@ -1,5 +1,6 @@
 ﻿using EpcbModel;
 using System;
+using System.IO;
 using System.Windows.Media.Imaging;
 
 namespace EpcbUtils
@@ -52,7 +53,11 @@ namespace EpcbUtils
 
 		public static BitmapImage GetMedfoto(int puntero)
 		{
-			var uri = new Uri(string.Format("{0}\\DBDAT\\MEDFOTO\\JUG{1}.bmp", PcbPathForBitmaps, puntero.ToString("00000")));
+			var uri = new Uri(string.Format("{0}\\Graficos\\MEDFOTO\\JUG{1}.bmp", AppDomain.CurrentDomain.BaseDirectory, puntero.ToString("00000")));
+			if (!File.Exists(uri.AbsolutePath))
+			{
+				uri = new Uri(string.Format("{0}\\DBDAT\\MEDFOTO\\JUG{1}.bmp", PcbPathForBitmaps, puntero.ToString("00000")));
+			}
 			BitmapImage foto;
 			try
 			{

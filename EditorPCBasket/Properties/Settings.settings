@@ -6,7 +6,7 @@
       <Value Profile="(Default)">C:\\Pc Basket 6.5\\</Value>
     </Setting>
     <Setting Name="AnoInicio" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">1999</Value>
+      <Value Profile="(Default)">1998</Value>
     </Setting>
   </Settings>
 </SettingsFile>

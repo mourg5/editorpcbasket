@@ -30,6 +30,17 @@ namespace Editor_PCBasket___Mou
 				Directory.CreateDirectory(logsPath);
 			}
 
+			var medfotoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MEDFOTO"));
+			var minifotoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MINIFOTO"));
+			var nanofotoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\NANOFOTO"));
+
+			if (!Directory.Exists(medfotoPath))
+			{
+				Directory.CreateDirectory(medfotoPath);
+				Directory.CreateDirectory(minifotoPath);
+				Directory.CreateDirectory(nanofotoPath);
+			}
+
 			AppDomain.CurrentDomain.FirstChanceException += (sender, eventArgs) =>
 			{
 				//LoggerUtils.LogException(eventArgs.Exception);
@@ -69,7 +80,7 @@ namespace Editor_PCBasket___Mou
 
 			try
 			{
-				equipoGen = HtmlParserUtils.GetEquipoFromHtml(UrlTextBox.Text, int.Parse(PunteroEquipo.Text), int.Parse(PunteroJugador.Text));
+				equipoGen = HtmlParserUtils.GetEquipoFromHtml(UrlTextBox.Text, int.Parse(PunteroEquipo.Text), int.Parse(PunteroJugador.Text), PhotosCheckbox.IsChecked.Value);
 				LoggerUtils.LogString("Generando equipo desde Proballers -> URL: " + UrlTextBox.Text + ". Puntero equipo: " + PunteroEquipo.Text + ". Puntero primer jugador: " + PunteroJugador.Text);
 			}
 			catch (Exception)
@@ -102,6 +113,13 @@ namespace Editor_PCBasket___Mou
 		{
 			Regex regex = new Regex("[^0-9]+");
 			e.Handled = regex.IsMatch(e.Text);
+		}
+
+		private void PhotosCheckbox_Changed(object sender, RoutedEventArgs e)
+		{
+			warningLabel.Visibility = PhotosCheckbox.IsChecked.Value
+				? Visibility.Visible 
+				: Visibility.Hidden;	
 		}
 	}
 }

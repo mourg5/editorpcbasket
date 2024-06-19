@@ -12,7 +12,7 @@ namespace EpcbUtils
 		private static List<int> _dorsales = Enumerable.Range(0, 99).OrderBy(g => Guid.NewGuid()).ToList();
 		private static int _i = 0;
 
-		public static Equipo GetEquipoFromHtml(string url, int pEquipo, int pJugador)
+		public static Equipo GetEquipoFromHtml(string url, int pEquipo, int pJugador, bool generatePhotos)
 		{
 			var web = new HtmlWeb();
 			var doc = web.Load(url);
@@ -39,8 +39,6 @@ namespace EpcbUtils
 			var punteroJug = pJugador;
 			foreach (var jugador in plantilla.SelectNodes("//tr"))
 			{
-				var jugPlantilla = new Jugador() { Puntero = punteroJug };
-
 				var jugNode = jugador.Descendants().ElementAt(3);
 				var nombre = jugNode.InnerText;
 
@@ -53,8 +51,7 @@ namespace EpcbUtils
 
 				try
 				{
-					var jug = GetJugadorFromUrl(urlJug);
-					jug.Puntero = punteroJug;
+					var jug = GetJugadorFromUrl(urlJug, punteroJug, generatePhotos);
 
 					equipoRes.Plantilla.Add(jug);
 					punteroJug++;
@@ -70,9 +67,9 @@ namespace EpcbUtils
 			return equipoRes;
 		}
 
-		private static Jugador GetJugadorFromUrl(string url)
+		private static Jugador GetJugadorFromUrl(string url, int puntero, bool generatePhotos)
 		{
-			var jugPlantilla = new Jugador();
+			var jugPlantilla = new Jugador() { Puntero = puntero };
 
 			var web = new HtmlWeb();
 			var doc = web.Load("https://www.proballers.com" + url);
@@ -142,6 +139,20 @@ namespace EpcbUtils
 			{
 				jugPlantilla.Demarcacion = 2;
 			}
+
+			// Fotos
+			if (generatePhotos)
+			{
+				try
+				{
+					var foto = doc.DocumentNode.SelectSingleNode("//div[@class='identity__picture identity__picture--player']").SelectSingleNode("img").Attributes["src"].Value;
+					PhotoUtils.CreatePhotos(foto, jugPlantilla);
+				}
+				catch (Exception ex)
+				{
+					LoggerUtils.LogException(ex);
+				}
+			}			
 
 			// Dorsal
 			jugPlantilla.Dorsal = _dorsales[_i];

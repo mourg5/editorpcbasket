@@ -38,6 +38,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 		{
 			LoggerUtils.LogString("Creando DBC para el equipo '" + Equipo.NombreCorto + "' (" + Equipo.Puntero + ")...");
 			HexUtils.SaveEquipoBytes(Equipo);
+			PhotoUtils.CopyPhotos(Equipo);
 		}
 
 		private bool CanExecuteGenerateDbc()
