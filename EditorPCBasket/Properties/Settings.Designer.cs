@@ -37,7 +37,7 @@ namespace Editor_PCBasket___Mou.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1998")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2024")]
         public int AnoInicio {
             get {
                 return ((int)(this["AnoInicio"]));

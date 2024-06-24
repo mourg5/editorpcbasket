@@ -20,6 +20,25 @@ namespace Editor_PCBasket___Mou
 	{
 		public MainWindow()
 		{
+			AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
+			{
+				LoggerUtils.LogException((Exception)eventArgs.ExceptionObject);
+			};
+
+			InitializeComponent();
+			SetFolders();
+
+			RutaTextBox.Text = Settings.Default.Path;
+			DbdatUtils.PcbPath = Settings.Default.Path;
+			HexUtils.AnoInicio = (short)Settings.Default.AnoInicio;
+
+			DispatcherHelper.Initialize();
+
+			DataContext = new MainViewModel();
+		}
+
+		private static void SetFolders()
+		{
 			var logsPath = AppDomain.CurrentDomain.BaseDirectory + "Logs";
 			var logFile = logsPath + "\\log_" + DateTime.Now.Ticks + ".txt";
 
@@ -40,26 +59,6 @@ namespace Editor_PCBasket___Mou
 				Directory.CreateDirectory(minifotoPath);
 				Directory.CreateDirectory(nanofotoPath);
 			}
-
-			AppDomain.CurrentDomain.FirstChanceException += (sender, eventArgs) =>
-			{
-				//LoggerUtils.LogException(eventArgs.Exception);
-			};
-
-			AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
-			{
-				LoggerUtils.LogException((Exception)eventArgs.ExceptionObject);
-			};
-
-			InitializeComponent();
-
-			RutaTextBox.Text = Settings.Default.Path;
-			DbdatUtils.PcbPath = Settings.Default.Path;
-			HexUtils.AnoInicio = (short)Settings.Default.AnoInicio;
-
-			DispatcherHelper.Initialize();
-
-			DataContext = new MainViewModel();
 		}
 
 		private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -109,6 +108,7 @@ namespace Editor_PCBasket___Mou
 				}
 			}
 		}
+
 		private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
 		{
 			Regex regex = new Regex("[^0-9]+");
