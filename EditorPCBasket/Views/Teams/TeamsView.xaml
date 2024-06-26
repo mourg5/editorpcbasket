@@ -19,6 +19,54 @@
                     </StackPanel>
                 </DataTemplate>
             </GroupBox.HeaderTemplate>
+            <Grid>
+                <Grid.Resources>
+                    <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+                        <Setter Property="Width" Value="120"/>
+                        <Setter Property="Height" Value="120"/>
+                        <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Badged.DarkForeground}"/>
+                    </Style>
+                    <Style TargetType="materialDesign:PackIcon">
+                        <Setter Property="Width" Value="90"/>
+                        <Setter Property="Height" Value="90"/>
+                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                    </Style>
+                </Grid.Resources>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel HorizontalAlignment="Center">
+                    <Button Command="{Binding CreateTeamCommand}">
+                        <materialDesign:PackIcon Kind="ShieldPlusOutline"/>
+                    </Button>
+                    <Label Content="Añadir nuevo equipo"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                    <Button Command="{Binding GenerateTeamCommand}">
+                        <materialDesign:PackIcon Kind="WebSync" Width="90" />
+                    </Button>
+                    <Label Content="Importar desde Proballers.com"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                    <Button Command="{Binding DeleteTeamCommand}">
+                        <materialDesign:PackIcon Kind="DeleteForever" Width="90" />
+                    </Button>
+                    <Label Content="Borrar equipo"/>
+                </StackPanel>
+                    
+                <StackPanel Grid.Column="3" HorizontalAlignment="Center">
+                    <Button Command="{Binding ExportTeamsCommand}">
+                        <materialDesign:PackIcon Kind="DatabaseExportOutline" Width="90" />
+                    </Button>
+                    <Label Content="Exportar BBDD a PC Basket"/>
+                </StackPanel> 
+            </Grid>
         </GroupBox>
 
         <GroupBox Margin="16" Style="{StaticResource MaterialDesignCardGroupBox}" Grid.Row="1">
@@ -26,17 +74,19 @@
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="FormatListBulletedType" Width="32" Height="32" VerticalAlignment="Center"/>
-                        <TextBlock Margin="8,0,0,0"
-                   VerticalAlignment="Center"
-                   Foreground="{DynamicResource MaterialDesign.Brush.Badged.DarkForeground}"
-                   Text="Lista de equipos" />
+                        <TextBlock Margin="8,0,0,0" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource MaterialDesign.Brush.Badged.DarkForeground}"
+                                   Text="Lista de equipos" />
                     </StackPanel>
                 </DataTemplate>
             </GroupBox.HeaderTemplate>
-            <DataGrid ItemsSource="{Binding TeamsList}" Name="EquiposDataGrid" 
+            <DataGrid ItemsSource="{Binding TeamsList}" 
+                      SelectedItem="{Binding SelectedTeam}"
+                      Name="EquiposDataGrid"                       
                       Margin="5"
                       ScrollViewer.CanContentScroll="True" 
                       AutoGenerateColumns="False"
+                      materialDesign:DataGridAssist.EnableEditBoxAssist="False"
                       ScrollViewer.VerticalScrollBarVisibility="Auto"
                       ScrollViewer.HorizontalScrollBarVisibility="Auto"
                       IsReadOnly="True">

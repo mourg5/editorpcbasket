@@ -45,6 +45,8 @@ namespace Editor_PCBasket___Mou.Services
 				}
 
 				DataBase.SaveChanges();
+
+				TeamsList = new ObservableCollection<Equipo>(GetTeams().ToList().OrderBy(e => e.Puntero));
 			}
 			catch (Exception ex)
 			{
@@ -59,6 +61,8 @@ namespace Editor_PCBasket___Mou.Services
 			DataBase.Database.ExecuteSqlCommand("delete from Equipos");
 
 			DataBase.SaveChanges();
+
+			TeamsList.Clear();
 		}
 
 		#endregion
@@ -76,7 +80,15 @@ namespace Editor_PCBasket___Mou.Services
 			return DataBase.Equipos.Include("Plantilla").Where(e => e.Puntero > 0).ToList();
 		}
 
-		public void SaveTeam(Equipo team)
+		public void DeleteTeam(Equipo team)
+		{
+			DataBase.Equipos.Remove(team);
+			DataBase.SaveChanges();
+
+			TeamsList.Remove(team);
+		}
+
+		public void AddTeam(Equipo team)
 		{
 			if (!DataBase.Equipos.Where(p => p.Puntero == team.Puntero).Any())
 			{

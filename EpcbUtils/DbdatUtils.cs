@@ -52,14 +52,14 @@ namespace EpcbUtils
 
 		public static BitmapImage GetMedfoto(int puntero)
 		{
-			var uri = new Uri(string.Format("{0}\\Graficos\\MEDFOTO\\JUG{1}.bmp", AppDomain.CurrentDomain.BaseDirectory, puntero.ToString("00000")));
-			if (!File.Exists(uri.AbsolutePath))
-			{
-				uri = new Uri(string.Format("{0}\\DBDAT\\MEDFOTO\\JUG{1}.bmp", PcbPathForBitmaps, puntero.ToString("00000")));
-			}
 			BitmapImage foto;
 			try
 			{
+				var uri = new Uri(string.Format("{0}\\Graficos\\MEDFOTO\\JUG{1}.bmp", AppDomain.CurrentDomain.BaseDirectory, puntero.ToString("00000")));
+				if (!File.Exists(uri.AbsolutePath))
+				{
+					uri = new Uri(string.Format("{0}\\DBDAT\\MEDFOTO\\JUG{1}.bmp", PcbPathForBitmaps, puntero.ToString("00000")));
+				}
 				foto = new BitmapImage(uri);
 			}
 			catch (Exception)
@@ -72,10 +72,10 @@ namespace EpcbUtils
 
 		public static BitmapImage Get3Desc(int puntero)
 		{
-			var uri = new Uri(string.Format("{0}\\DBDAT\\3DESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
 			BitmapImage escudo;
 			try
 			{
+				var uri = new Uri(string.Format("{0}\\DBDAT\\3DESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
 				escudo = new BitmapImage(uri);
 			}
 			catch (Exception)
@@ -88,10 +88,10 @@ namespace EpcbUtils
 
 		public static BitmapImage GetMiniesc(int puntero)
 		{
-			var uri = new Uri(string.Format("{0}\\DBDAT\\MINIESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
 			BitmapImage escudo;
 			try
 			{
+				var uri = new Uri(string.Format("{0}\\DBDAT\\MINIESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
 				escudo = new BitmapImage(uri);
 			}
 			catch (Exception)
@@ -104,10 +104,10 @@ namespace EpcbUtils
 		
 		public static BitmapImage GetNanoesc(int puntero)
 		{
-			var uri = new Uri(string.Format("{0}\\DBDAT\\NANOESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
 			BitmapImage escudo;
 			try
 			{
+				var uri = new Uri(string.Format("{0}\\DBDAT\\NANOESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
 				escudo = new BitmapImage(uri);
 			}
 			catch (Exception)
@@ -120,10 +120,10 @@ namespace EpcbUtils
 
 		public static BitmapImage GetRidiesc(int puntero)
 		{
-			var uri = new Uri(string.Format("{0}\\DBDAT\\RIDIESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
 			BitmapImage escudo;
 			try
 			{
+				var uri = new Uri(string.Format("{0}\\DBDAT\\RIDIESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
 				escudo = new BitmapImage(uri);
 			}
 			catch (Exception)

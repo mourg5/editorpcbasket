@@ -547,7 +547,9 @@ namespace EpcbUtils
 				return;
 			}
 
-			var teamFile = File.OpenWrite(CheckPreviousDbc(equipo));
+			var dbcPath = CheckPreviousDbc(equipo);
+
+			var teamFile = File.OpenWrite(dbcPath);
 
 			try
 			{
@@ -647,9 +649,12 @@ namespace EpcbUtils
 				AddBytes(teamFile, bytesToAdd);
 
 				teamFile.Close();
+
+				LoggerUtils.LogString(string.Format("[DBC] Exportado equipo '{0}' a fichero {1}", equipo.NombreCorto, dbcPath));
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				LoggerUtils.LogException(ex);
 				teamFile.Close();
 			}
 		}
@@ -838,7 +843,7 @@ namespace EpcbUtils
 
 				File.Move(filePath, backupFile);
 
-				LoggerUtils.LogString(string.Format("El equipo {0} ya tenía DBC asociado. Se ha movido el archivo a la carpeta Backup", equipo.NombreCorto));
+				LoggerUtils.LogString(string.Format("[DBC] El equipo '{0}' ya tenía DBC asociado. Se ha movido el archivo a la carpeta Backup", equipo.NombreCorto));
 			}
 
 			return filePath;

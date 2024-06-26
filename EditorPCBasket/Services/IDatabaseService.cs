@@ -1,7 +1,6 @@
 ﻿using EpcbModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Documents;
 
 namespace Editor_PCBasket___Mou.Services
 {
@@ -12,7 +11,8 @@ namespace Editor_PCBasket___Mou.Services
 
 		Equipo GetTeam(int puntero);
 		IEnumerable<Equipo> GetTeams();
-		void SaveTeam(Equipo equipo);
+		void AddTeam(Equipo team);
+		void DeleteTeam(Equipo team);
 		int GetNumberOfTeams();
 
 
