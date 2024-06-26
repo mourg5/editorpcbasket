@@ -24,12 +24,12 @@ namespace Editor_PCBasket___Mou.ViewModels
 			_random = new Random(DateTime.Now.Millisecond);
 			NombreEquipo = "Libre";
 
-			var equipo = DataBaseUtils.DataBase.GetEquipoOfJugador(jugador);
+			//var equipo = DataBaseUtils.DataBase.GetEquipoOfJugador(jugador);
 
-			if (equipo == null) return;
+			//if (equipo == null) return;
 
-			NombreEquipo = equipo.NombreLargo;
-			EscudoImageSource = DbdatUtils.GetNanoesc(equipo.Puntero);
+			//NombreEquipo = equipo.NombreLargo;
+			//EscudoImageSource = DbdatUtils.GetNanoesc(equipo.Puntero);
 		}
 
 		public bool ApplyChanges = false;

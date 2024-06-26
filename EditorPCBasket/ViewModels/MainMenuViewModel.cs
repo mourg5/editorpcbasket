@@ -1,4 +1,5 @@
 ﻿using Editor_PCBasket___Mou.Services;
+using EpcbCommon.Contracts;
 using Prism.Commands;
 using Prism.Regions;
 using static Editor_PCBasket___Mou.Config.NavigationEnums;
@@ -8,10 +9,11 @@ namespace Editor_PCBasket___Mou.ViewModels
 	public class MainMenuViewModel : INavigationAware
 	{
 		private INavigationService _navigationService;
-		public MainMenuViewModel(INavigationService navigationService)
+		private IConfigurationService _configurationService;
+		public MainMenuViewModel(INavigationService navigationService, IConfigurationService configurationService)
 		{
 			_navigationService = navigationService;
-
+			_configurationService = configurationService;
 			InitializeCommands();
 		}
 
@@ -52,7 +54,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 
 		private bool CanExecuteEditCommands()
 		{
-			return Properties.Settings.Default.SettingsCompleted;
+			return _configurationService.Config.SettingsCompleted;
 		}
 
 		#endregion

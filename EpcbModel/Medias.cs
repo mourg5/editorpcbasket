@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EpcbModel
 {
 	public class Medias : INotifyPropertyChanged
 	{
+		public int Id { get; set; }
+
 		private int velocidad;
 		private int salto;
 		private int resistencia;

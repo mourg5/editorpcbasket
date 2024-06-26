@@ -1,6 +1,9 @@
 ﻿using Editor_PCBasket___Mou.Config;
 using Editor_PCBasket___Mou.Properties;
 using Editor_PCBasket___Mou.Services;
+using EpcbCommon.Contracts;
+using EpcbCommon.Services;
+using EpcbDatabaseServiceEntityFramework;
 using EpcbUtils;
 using Prism.Ioc;
 using Prism.Unity;
@@ -35,24 +38,14 @@ namespace Editor_PCBasket___Mou
 			};
 
 			SetFolders();
-			InitializeDataBase();
-
-			HexUtils.AnoInicio = (short)Settings.Default.AnoInicio;
 
 			LoggerUtils.LogString(string.Format("============= Iniciando Editor PCBasket. Versión {0} =============", Assembly.GetExecutingAssembly().GetName().Version));
 
 			Container.Resolve<INavigationService>().NavigateTo(NavigationRegion.MainRegion, NavigationView.MainMenuView, this);
 		}
 
-		private void InitializeDataBase()
-		{
-			DataBaseUtils.DataBase = Container.Resolve<IDatabaseService>().DataBase;
-		}
-
 		private static void SetFolders()
 		{
-			DbdatUtils.PcbPath = Settings.Default.Path;
-
 			var logsPath = AppDomain.CurrentDomain.BaseDirectory + "Logs";
 			var logFile = logsPath + "\\log_" + DateTime.Now.Ticks + ".txt";
 
@@ -79,7 +72,8 @@ namespace Editor_PCBasket___Mou
 		{
 			containerRegistry.AddViews();
 			containerRegistry.RegisterSingleton<INavigationService, NavigationService>();
-			containerRegistry.RegisterSingleton<IDatabaseService, DatabaseService>();
+			containerRegistry.RegisterSingleton<IDatabaseService, EntityFrameworkDatabaseService>();
+			containerRegistry.RegisterSingleton<IConfigurationService, ConfigurationService>();
 		}
 
 		protected override Window CreateShell()

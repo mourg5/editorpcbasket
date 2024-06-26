@@ -5,21 +5,24 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using EpcbCommon.Contracts;
 
-namespace Editor_PCBasket___Mou.Services
+namespace EpcbDatabaseServiceEntityFramework
 {
-	public class DatabaseService : IDatabaseService
+	public class EntityFrameworkDatabaseService : IDatabaseService
 	{
 		public PcBasketContext DataBase { get { return _locator.Current; } }
 
 		private PcBasketDbLocator _locator;
+		private IConfigurationService _configuration;
 
 		public ObservableCollection<Equipo> TeamsList { get; private set; }
 
-		public DatabaseService()
+		public EntityFrameworkDatabaseService(IConfigurationService configuration)
 		{
 			_locator = new PcBasketDbLocator();
 			TeamsList = new ObservableCollection<Equipo>(GetTeams().ToList().OrderBy(e => e.Puntero));
+			_configuration = configuration;
 		}
 
 		#region DB Creation
@@ -30,7 +33,7 @@ namespace Editor_PCBasket___Mou.Services
 			{
 				Reset();
 
-				foreach (var dbc in Directory.GetFiles(Properties.Settings.Default.Path + "\\DBDAT\\EQ022022"))
+				foreach (var dbc in Directory.GetFiles(_configuration.Config.PcbPath + "\\DBDAT\\EQ022022"))
 				{
 					using (var eqFile = File.OpenRead(dbc))
 					{
@@ -57,8 +60,8 @@ namespace Editor_PCBasket___Mou.Services
 		public void Reset()
 		{
 			_locator.Reset();
-			DataBase.Database.ExecuteSqlCommand("delete from Jugadores");
-			DataBase.Database.ExecuteSqlCommand("delete from Equipos");
+			//DataBase.Database.ExecuteSqlCommand("delete from Jugadores");
+			//DataBase.Database.ExecuteSqlCommand("delete from Equipos");
 
 			DataBase.SaveChanges();
 
@@ -77,7 +80,7 @@ namespace Editor_PCBasket___Mou.Services
 
 		public IEnumerable<Equipo> GetTeams()
 		{
-			return DataBase.Equipos.Include("Plantilla").Where(e => e.Puntero > 0).ToList();
+			return DataBase.Equipos.Where(e => e.Puntero > 0).ToList();
 		}
 
 		public void DeleteTeam(Equipo team)

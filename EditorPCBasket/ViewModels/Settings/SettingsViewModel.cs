@@ -1,4 +1,5 @@
 ﻿using Editor_PCBasket___Mou.Services;
+using EpcbCommon.Contracts;
 using Ookii.Dialogs.Wpf;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -14,10 +15,14 @@ namespace Editor_PCBasket___Mou.ViewModels.Settings
 	{
 		private INavigationService _navigationService;
 		private IDatabaseService _databaseService;
-		public SettingsViewModel(INavigationService navigationService, IDatabaseService databaseService)
+		private IConfigurationService _configurationService;
+		public SettingsViewModel(INavigationService navigationService, IDatabaseService databaseService, IConfigurationService configurationService)
 		{
 			_navigationService = navigationService;
 			_databaseService = databaseService;
+			_configurationService = configurationService;
+
+			PcbPath = _configurationService.Config.PcbPath;
 
 			InitializeCommands();
 			CheckPcbPath(PcbPath);
@@ -32,7 +37,7 @@ namespace Editor_PCBasket___Mou.ViewModels.Settings
 
 		#region Bindings
 
-		private string _pcbPath = Properties.Settings.Default.Path;
+		private string _pcbPath;
 		public string PcbPath
 		{
 			get { return _pcbPath; }
@@ -158,16 +163,16 @@ namespace Editor_PCBasket___Mou.ViewModels.Settings
 			CheckPcbPath(selectedFolder);
 
 			PcbPath = selectedFolder;
-			Properties.Settings.Default.Path = selectedFolder;
+			_configurationService.Config.PcbPath = selectedFolder;
 			AcceptCommand.RaiseCanExecuteChanged();
 			GenerateDbCommand.RaiseCanExecuteChanged();
 		}
 
 		private void ExecuteAccept()
 		{
-			Properties.Settings.Default.Path = PcbPath;
-			Properties.Settings.Default.SettingsCompleted = true;
-			Properties.Settings.Default.Save();
+			_configurationService.Config.PcbPath = PcbPath;
+			_configurationService.Config.SettingsCompleted = true;
+
 			_navigationService.NavigateTo(NavigationView.MainMenuView, this);
 		}
 

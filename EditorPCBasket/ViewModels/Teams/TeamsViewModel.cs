@@ -1,15 +1,10 @@
-﻿using Editor_PCBasket___Mou.Services;
-using Editor_PCBasket___Mou.Views;
+﻿using Editor_PCBasket___Mou.Views;
+using EpcbCommon.Contracts;
 using EpcbModel;
 using EpcbUtils;
 using Prism.Commands;
 using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Editor_PCBasket___Mou.ViewModels.Teams
 {

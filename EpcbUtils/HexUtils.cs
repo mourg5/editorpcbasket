@@ -1,4 +1,6 @@
-﻿using EpcbModel;
+﻿using Config.Net;
+using EpcbCommon.Contracts;
+using EpcbModel;
 using KGySoft.CoreLibraries;
 using System;
 using System.Collections.Generic;
@@ -13,7 +15,7 @@ namespace EpcbUtils
 		static DinamicEncoding DinamicEncoding = new DinamicEncoding();
 		private static Random _random = new Random(DateTime.Now.Millisecond);
 
-		public static short AnoInicio { get; set; }
+		private static IConfiguration _config = new ConfigurationBuilder<IConfiguration>().UseAppConfig().Build();
 
 		public static Equipo ReadEquipoBytes(FileStream teamFile)
 		{
@@ -285,7 +287,7 @@ namespace EpcbUtils
 				var bytesFnac = new byte[2];
 				playerFile.Read(bytesFnac, 0, 2);
 
-				var difAnnos = DateTime.Now.Year - AnoInicio;
+				var difAnnos = DateTime.Now.Year - _config.StartingYear;
 				var anoNac = BitConverter.ToInt16(bytesFnac, 0) + difAnnos;
 
 				newJugador.AnoNacimiento = anoNac;
@@ -390,7 +392,7 @@ namespace EpcbUtils
 				var bytesFnac = new byte[2];
 				playerFile.Read(bytesFnac, 0, 2);
 
-				var difAnnos = DateTime.Now.Year - AnoInicio;
+				var difAnnos = DateTime.Now.Year - _config.StartingYear;
 				var anoNac = BitConverter.ToInt16(bytesFnac, 0) + difAnnos;
 
 				newJugador.AnoNacimiento = anoNac;
@@ -473,7 +475,7 @@ namespace EpcbUtils
 			// Fecha nacimiento - día, mes, año
 			playerFile.WriteByte(1);
 			playerFile.WriteByte(1);
-			var difAnnos = DateTime.Now.Year - AnoInicio;
+			var difAnnos = DateTime.Now.Year - _config.StartingYear;
 			var bytesAnoNac = BitConverter.GetBytes((short)(jugador.AnoNacimiento - difAnnos));
 			playerFile.Write(bytesAnoNac, 0, bytesAnoNac.Length);
 
@@ -782,7 +784,7 @@ namespace EpcbUtils
 			// Fecha nacimiento - día, mes, año
 			playerFile.WriteByte(1);
 			playerFile.WriteByte(1);
-			var difAnnos = DateTime.Now.Year - AnoInicio;
+			var difAnnos = DateTime.Now.Year - _config.StartingYear;
 			var bytesAnoNac = BitConverter.GetBytes((short)(jugador.AnoNacimiento - difAnnos));
 			playerFile.Write(bytesAnoNac, 0, bytesAnoNac.Length);
 

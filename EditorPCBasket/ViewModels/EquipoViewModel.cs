@@ -143,7 +143,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 		private void ExecuteSaveEquipo()
 		{
 			LoggerUtils.LogString("Guardando equipo '" + Equipo.NombreCorto + "' en la base de datos...");
-			DataBaseUtils.GuardarEquipo(Equipo);
+			//DataBaseUtils.GuardarEquipo(Equipo);
 		}
 
 		private bool CanExecuteSaveEquipo()

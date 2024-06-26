@@ -1,12 +1,10 @@
 ﻿using EpcbModel;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Editor_PCBasket___Mou.Services
+namespace EpcbCommon.Contracts
 {
 	public interface IDatabaseService
 	{
-		PcBasketContext DataBase { get; }
 		ObservableCollection<Equipo> TeamsList { get; }
 
 		Equipo GetTeam(int puntero);
