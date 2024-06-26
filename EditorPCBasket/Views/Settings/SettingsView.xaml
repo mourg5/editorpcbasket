@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid Background="{DynamicResource MaterialDesignLightBackground}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,40">
+        <Grid Background="{DynamicResource MaterialDesign.Brush.Badged.LightBackground}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,40">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
@@ -16,7 +16,7 @@
                                 <materialDesign:PackIcon Kind="Basketball" Width="32" Height="32" VerticalAlignment="Center"/>
                                 <TextBlock Margin="8,0,0,0"
                                    VerticalAlignment="Center"
-                                   Foreground="{DynamicResource MaterialDesignDarkForeground}"
+                                   Foreground="{DynamicResource MaterialDesign.Brush.Badged.DarkForeground}"
                                    Text="Instalación PC Basket" />
                             </StackPanel>
                         </DataTemplate>
@@ -144,7 +144,7 @@
                                 <materialDesign:PackIcon Kind="Database" Width="32" Height="32" VerticalAlignment="Center"/>
                                 <TextBlock Margin="8,0,0,0" 
                                        VerticalAlignment="Center" 
-                                       Foreground="{DynamicResource MaterialDesignDarkForeground}" 
+                                       Foreground="{DynamicResource MaterialDesign.Brush.Badged.DarkForeground}" 
                                        Text="Base de datos" />
                             </StackPanel>
                         </DataTemplate>
@@ -187,7 +187,7 @@
                                 <materialDesign:PackIcon Kind="Export" Width="32" Height="32" VerticalAlignment="Center" />
                                 <TextBlock Margin="8,0,0,0"
                                    VerticalAlignment="Center"
-                                   Foreground="{DynamicResource MaterialDesignDarkForeground}"
+                                   Foreground="{DynamicResource MaterialDesign.Brush.Badged.DarkForeground}"
                                    Text="Exportación de datos" />
                             </StackPanel>
                         </DataTemplate>
