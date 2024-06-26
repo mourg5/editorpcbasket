@@ -1,0 +1,13 @@
+﻿using Prism.Mvvm;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Editor_PCBasket___Mou.ViewModels.Players
+{
+	public class PlayersViewModel : BindableBase
+	{
+	}
+}

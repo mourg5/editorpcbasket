@@ -1,0 +1,52 @@
+﻿<UserControl x:Class="Editor_PCBasket___Mou.Views.MainMenuView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <UserControl.Resources>
+        <Style TargetType="Label">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDesignDarkForeground}"/>
+        </Style>
+        <Style TargetType="materialDesign:PackIcon">
+            <Setter Property="Height" Value="180"/>
+            <Setter Property="Width" Value="180"/>
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDesignDarkForeground}"/>
+        </Style>
+        <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+            <Setter Property="Height" Value="240"/>
+            <Setter Property="Width" Value="240"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid VerticalAlignment="Stretch" Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Button Command="{Binding SettingsCommand}">
+            <StackPanel>
+                <materialDesign:PackIcon Kind="WrenchCogOutline"/>
+                <Label Content="Ajustes"/>
+            </StackPanel>
+        </Button>
+        <Button Grid.Column="1" Command="{Binding TeamsCommand}">
+            <StackPanel>
+                <materialDesign:PackIcon Kind="PoliceBadgeOutline"/>
+                <Label Content="Equipos"/>
+            </StackPanel>
+        </Button>
+        <Button Grid.Column="2" Command="{Binding PlayersCommand}">
+            <StackPanel>
+                <materialDesign:PackIcon Kind="CardAccountDetailsOutline"/>
+                <Label Content="Jugadores"/>
+            </StackPanel>
+        </Button>
+        <Button Grid.Column="3" Command="{Binding ManagerCommand}">
+            <StackPanel>
+                <materialDesign:PackIcon Kind="ApplicationBracesOutline"/>
+                <Label Content="MANAGER.EXE"/>
+            </StackPanel>
+        </Button>
+    </Grid>
+</UserControl>

@@ -1,27 +1,23 @@
 ﻿using EpcbModel;
 using EpcbUtils;
 using EpcbUtils.Messages;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
-using GalaSoft.MvvmLight.Threading;
+using Prism.Commands;
+using Prism.Mvvm;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
 namespace Editor_PCBasket___Mou
 {
-	public class MainViewModel : ViewModelBase
+	public class MainViewModel : BindableBase
 	{
 		public MainViewModel()
 		{
-			LoggerUtils.LogString(string.Format("============= Iniciando Editor PCBasket. Versión {0} =============", Assembly.GetExecutingAssembly().GetName().Version));
 			ReloadEquiposList();
 			//ReloadJugadoresList();
-			Messenger.Default.Register<StatusMessage>(this, ProcessStatusMessage);
+			//Messenger.Default.Register<StatusMessage>(this, ProcessStatusMessage);
 			_statusBarTimer = new Timer()
 			{
 				Interval = 5000,
@@ -39,10 +35,10 @@ namespace Editor_PCBasket___Mou
 
 		private void ProcessStatusMessage(StatusMessage obj)
 		{
-			DispatcherHelper.CheckBeginInvokeOnUI(() =>
-			{
-				StatusBarText = obj.Message;
-			});
+			//Dispatcher.BeginInvoke(() =>
+			//{
+			//	StatusBarText = obj.Message;
+			//});
 
 			_statusBarTimer.Start();
 		}
@@ -51,25 +47,25 @@ namespace Editor_PCBasket___Mou
 		public ObservableCollection<Equipo> EquiposList
 		{
 			get { return _equiposList; }
-			set { Set(() => EquiposList, ref _equiposList, value); }
+			set { SetProperty(ref _equiposList, value); }
 		}
 
 		private ObservableCollection<Jugador> _jugadoresList;
 		public ObservableCollection<Jugador> JugadoresList
 		{
 			get { return _jugadoresList; }
-			set { Set(() => JugadoresList, ref _jugadoresList, value); }
+			set { SetProperty(ref _jugadoresList, value); }
 		}
 
-		private RelayCommand _createDatabaseCommand;
+		private DelegateCommand _createDatabaseCommand;
 
-		public RelayCommand CreateDatabaseCommand
+		public DelegateCommand CreateDatabaseCommand
 		{
 			get
 			{
 				if (_createDatabaseCommand == null)
 				{
-					_createDatabaseCommand = new RelayCommand(ExecuteCreateDatabase, CanExecuteCreateDatabase);
+					_createDatabaseCommand = new DelegateCommand(ExecuteCreateDatabase, CanExecuteCreateDatabase);
 				}
 				return _createDatabaseCommand;
 			}
@@ -80,7 +76,7 @@ namespace Editor_PCBasket___Mou
 		public string StatusBarText
 		{
 			get { return _statusBarText; }
-			set { Set(() => StatusBarText, ref _statusBarText, value); }
+			set { SetProperty(ref _statusBarText, value); }
 		}
 
 		private async void ExecuteCreateDatabase()

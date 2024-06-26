@@ -1,14 +1,13 @@
-﻿using GalaSoft.MvvmLight;
+﻿using Prism.Mvvm;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EpcbModel
 {
-	public class Equipo : ViewModelBase
+	[Table("Equipos")]
+	public class Equipo : BindableBase
 	{
 		public Equipo()
 		{
@@ -23,7 +22,7 @@ namespace EpcbModel
 			get { return _puntero; }
 			set
 			{
-				if (!Set(() => Puntero, ref _puntero, value)) return;
+				if (!SetProperty(ref _puntero, value)) return;
 			}
 		}
 
@@ -32,7 +31,7 @@ namespace EpcbModel
 		public string NombreCorto
 		{
 			get { return _nombreCorto; }
-			set { Set(() => NombreCorto, ref _nombreCorto, value); }
+			set { SetProperty(ref _nombreCorto, value); }
 		}
 
 		private string _nombreLargo;
@@ -40,7 +39,7 @@ namespace EpcbModel
 		public string NombreLargo
 		{
 			get { return _nombreLargo; }
-			set { Set(() => NombreLargo, ref _nombreLargo, value); }
+			set { SetProperty(ref _nombreLargo, value); }
 		}
 
 		private string _pabellon;
@@ -48,7 +47,7 @@ namespace EpcbModel
 		public string Pabellon
 		{
 			get { return _pabellon; }
-			set { Set(() => Pabellon, ref _pabellon, value); }
+			set { SetProperty(ref _pabellon, value); }
 		}
 
 		private int _aforo;
@@ -56,7 +55,7 @@ namespace EpcbModel
 		public int Aforo
 		{
 			get { return _aforo; }
-			set { Set(() => Aforo, ref _aforo, value); }
+			set { SetProperty(ref _aforo, value); }
 		}
 
 		private int _presupuesto;
@@ -64,7 +63,7 @@ namespace EpcbModel
 		public int Presupuesto
 		{
 			get { return _presupuesto; }
-			set { Set(() => Presupuesto, ref _presupuesto, value); }
+			set { SetProperty(ref _presupuesto, value); }
 		}
 
 		private string _entrenador;
@@ -72,7 +71,7 @@ namespace EpcbModel
 		public string Entrenador
 		{
 			get { return _entrenador; }
-			set { Set(() => Entrenador, ref _entrenador, value); }
+			set { SetProperty(ref _entrenador, value); }
 		}
 
 		private Pais _pais;
@@ -80,13 +79,13 @@ namespace EpcbModel
 		public Pais Pais
 		{
 			get { return _pais; }
-			set { Set(() => Pais, ref _pais, value); }
+			set { SetProperty(ref _pais, value); }
 		}
 
 		public void ReloadMedias()
 		{
-			RaisePropertyChanged(() => MediaPlantilla);
-			RaisePropertyChanged(() => MediaQuinteto);
+			RaisePropertyChanged("MediaPlantilla");
+			RaisePropertyChanged("MediaQuinteto");
 		}
 		public double MediaQuinteto
 		{
@@ -103,7 +102,7 @@ namespace EpcbModel
 		public ObservableCollection<Jugador> Plantilla
 		{
 			get { return _plantilla; }
-			set { Set(() => Plantilla, ref _plantilla, value); }
+			set { SetProperty(ref _plantilla, value); }
 		}
 	}
 }

@@ -1,14 +1,13 @@
 ﻿using EpcbModel;
 using EpcbUtils;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using Prism.Commands;
+using Prism.Mvvm;
 using System;
-using System.IO;
 using System.Windows.Media.Imaging;
 
 namespace Editor_PCBasket___Mou.ViewModels
 {
-	public class JugadorViewModel : ViewModelBase
+	public class JugadorViewModel : BindableBase
 	{
 		public JugadorViewModel()
 		{
@@ -40,7 +39,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 		public string NombreEquipo
 		{
 			get { return _nombreEquipo; }
-			set { Set(() => NombreEquipo, ref _nombreEquipo, value); }
+			set { SetProperty(ref _nombreEquipo, value); }
 		}
 
 		private BitmapImage _escudoImageSource;
@@ -48,41 +47,41 @@ namespace Editor_PCBasket___Mou.ViewModels
 		public BitmapImage EscudoImageSource
 		{
 			get { return _escudoImageSource; }
-			set { Set(() => EscudoImageSource, ref _escudoImageSource, value); }
+			set { SetProperty(	ref _escudoImageSource, value); }
 		}
 
 		private Jugador _jugador;
 		public Jugador Jugador
 		{
 			get { return _jugador; }
-			set { Set(() => Jugador, ref _jugador, value); }
+			set { SetProperty(ref _jugador, value); }
 		}
 
 		private BitmapImage _banderaImageSource;
 		public BitmapImage BanderaImageSource
 		{
 			get { return _banderaImageSource; }
-			set { Set(() => BanderaImageSource, ref _banderaImageSource, value); }
+			set { SetProperty(ref _banderaImageSource, value); }
 		}
 
 		private BitmapImage _fotoImageSource;
 		public BitmapImage FotoImageSource
 		{
 			get { return _fotoImageSource; }
-			set { Set(() => FotoImageSource, ref _fotoImageSource, value); }
+			set { SetProperty(ref _fotoImageSource, value); }
 		}
 
 		#region Generador medias 
 
-		private RelayCommand _generarMediaCommand;
+		private DelegateCommand _generarMediaCommand;
 
-		public RelayCommand GenerarMediaCommand
+		public DelegateCommand GenerarMediaCommand
 		{
 			get
 			{
 				if (_generarMediaCommand == null)
 				{
-					_generarMediaCommand = new RelayCommand(ExecuteGenerarMedia, CanExecuteGenerarMedia);
+					_generarMediaCommand = new DelegateCommand(ExecuteGenerarMedia, CanExecuteGenerarMedia);
 				}
 				return _generarMediaCommand;
 			}
@@ -348,7 +347,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 		public bool IsVeloz
 		{
 			get { return _isVeloz; }
-			set { Set(() => IsVeloz, ref _isVeloz, value); }
+			set { SetProperty(ref _isVeloz, value); }
 		}
 
 		private bool _isAtletico;
@@ -356,7 +355,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 		public bool IsAtletico
 		{
 			get { return _isAtletico; }
-			set { Set(() => IsAtletico, ref _isAtletico, value); }
+			set { SetProperty(ref _isAtletico, value); }
 		}
 
 		private bool _isIntimidador;
@@ -364,7 +363,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 		public bool IsIntimidador
 		{
 			get { return _isIntimidador; }
-			set { Set(() => IsIntimidador, ref _isIntimidador, value); }
+			set { SetProperty(	ref _isIntimidador, value); }
 		}
 
 		private bool _isTirador;
@@ -372,7 +371,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 		public bool IsTirador
 		{
 			get { return _isTirador; }
-			set { Set(() => IsTirador, ref _isTirador, value); }
+			set { SetProperty(ref _isTirador, value); }
 		}
 
 		private bool _isCreador;
@@ -380,7 +379,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 		public bool IsCreador
 		{
 			get { return _isCreador; }
-			set { Set(() => IsCreador, ref _isCreador, value); }
+			set { SetProperty(ref _isCreador, value); }
 		}
 
 		private bool _isDefensor;
@@ -388,7 +387,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 		public bool IsDefensor
 		{
 			get { return _isDefensor; }
-			set { Set(() => IsDefensor, ref _isDefensor, value); }
+			set { SetProperty(ref _isDefensor, value); }
 		}
 
 		private int _mediaDeseada;
@@ -398,7 +397,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 			set
 			{
 				value = Math.Min(95, Math.Max(11, value));
-				Set(() => MediaDeseada, ref _mediaDeseada, value);
+				SetProperty(ref _mediaDeseada, value);
 				GenerarMediaCommand.RaiseCanExecuteChanged();
 			}
 		}

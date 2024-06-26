@@ -25,7 +25,7 @@ namespace Editor_PCBasket___Mou.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\\\Pc Basket 6.5\\\\")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string Path {
             get {
                 return ((string)(this["Path"]));
@@ -44,6 +44,18 @@ namespace Editor_PCBasket___Mou.Properties {
             }
             set {
                 this["AnoInicio"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SettingsCompleted {
+            get {
+                return ((bool)(this["SettingsCompleted"]));
+            }
+            set {
+                this["SettingsCompleted"] = value;
             }
         }
     }

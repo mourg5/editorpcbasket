@@ -1,0 +1,8 @@
+﻿<UserControl x:Class="Editor_PCBasket___Mou.Views.Manager.ManagerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+             xmlns:local="clr-namespace:Editor_PCBasket___Mou.Views.Manager">
+    <Grid>
+            
+    </Grid>
+</UserControl>

@@ -139,8 +139,6 @@ namespace EpcbUtils
 			{
 				foreach (var jugador in equipo.Plantilla)
 				{
-					var medpath = string.Format("");
-
 					var medfoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MEDFOTO\\JUG{0:00000}.bmp", jugador.Puntero));
 					var minifoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MINIFOTO\\JUG{0:00000}.bmp", jugador.Puntero));
 					var nanofoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\NANOFOTO\\JUG{0:00000}.bmp", jugador.Puntero));

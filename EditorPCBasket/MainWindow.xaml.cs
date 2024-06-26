@@ -1,15 +1,8 @@
-﻿using Editor_PCBasket___Mou.Properties;
-using Editor_PCBasket___Mou.Views;
-using EpcbModel;
-using EpcbUtils;
-using GalaSoft.MvvmLight.Threading;
-using System;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Windows;
-using System.Windows.Forms;
+﻿using Editor_PCBasket___Mou.Services;
+using static Editor_PCBasket___Mou.Config.NavigationEnums;
+using System.Windows.Controls;
 using System.Windows.Input;
-using MessageBox = System.Windows.MessageBox;
+using System.Windows;
 
 namespace Editor_PCBasket___Mou
 {
@@ -18,108 +11,77 @@ namespace Editor_PCBasket___Mou
 	/// </summary>
 	public partial class MainWindow
 	{
-		public MainWindow()
-		{
-			AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
-			{
-				LoggerUtils.LogException((Exception)eventArgs.ExceptionObject);
-			};
+		private INavigationService _navigationService;
 
+		public MainWindow(INavigationService navigationService)
+		{
 			InitializeComponent();
-			SetFolders();
-
-			RutaTextBox.Text = Settings.Default.Path;
-			DbdatUtils.PcbPath = Settings.Default.Path;
-			HexUtils.AnoInicio = (short)Settings.Default.AnoInicio;
-
-			DispatcherHelper.Initialize();
-
-			DataContext = new MainViewModel();
+			_navigationService = navigationService;
 		}
 
-		private static void SetFolders()
+		#region Appbar buttons
+
+		private void GoBackButtonClick(object sender, RoutedEventArgs e)
 		{
-			var logsPath = AppDomain.CurrentDomain.BaseDirectory + "Logs";
-			var logFile = logsPath + "\\log_" + DateTime.Now.Ticks + ".txt";
+			_navigationService.GoBack(NavigationRegion.MainRegion);
+		}
+		private void GoForwardButtonClick(object sender, RoutedEventArgs e)
+		{
+			_navigationService.GoForward(NavigationRegion.MainRegion);
+		}
+		private void GoHomeButtonClick(object sender, RoutedEventArgs e)
+		{
+			_navigationService.NavigateTo(NavigationView.MainMenuView, this);
+		}
+		private void MinimizeClick(object sender, RoutedEventArgs e)
+		{
+			WindowState = WindowState.Minimized;
+		}
+		private void MaximizeClick(object sender, RoutedEventArgs e)
+		{
+			MaximizeWindow();
+		}
+		private void CloseClick(object sender, RoutedEventArgs e)
+		{
+			Application.Current.Shutdown();
+		}
+		private void ColorZone_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			if (e.ChangedButton == MouseButton.Left)
+				DragMove();
+		}
+		private void ColorZone_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		{
+			if (e.OriginalSource.GetType() != typeof(Border)) return;
 
-			LoggerUtils.LogFilePath = logFile;
-
-			if (!Directory.Exists(logsPath))
-			{
-				Directory.CreateDirectory(logsPath);
-			}
-
-			var medfotoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MEDFOTO"));
-			var minifotoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MINIFOTO"));
-			var nanofotoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\NANOFOTO"));
-
-			if (!Directory.Exists(medfotoPath))
-			{
-				Directory.CreateDirectory(medfotoPath);
-				Directory.CreateDirectory(minifotoPath);
-				Directory.CreateDirectory(nanofotoPath);
-			}
+			MaximizeWindow();
 		}
 
-		private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		private void MaximizeWindow()
 		{
-			var equipo = EquiposDataGrid.SelectedItem as Equipo;
-			if (equipo != null)
+			if (WindowState == WindowState.Maximized)
 			{
-				var equipoWindow = new EquipoWindow(equipo);
-				equipoWindow.Show();
+				WindowState = WindowState.Normal;
 			}
-		}
-
-		private void Button_Click(object sender, RoutedEventArgs e)
-		{
-			if (string.IsNullOrEmpty(UrlTextBox.Text) || string.IsNullOrEmpty(UrlTextBox.Text) || string.IsNullOrEmpty(PunteroJugador.Text)) return;
-
-			Equipo equipoGen;
-
-			try
+			else
 			{
-				equipoGen = HtmlParserUtils.GetEquipoFromHtml(UrlTextBox.Text, int.Parse(PunteroEquipo.Text), int.Parse(PunteroJugador.Text), PhotosCheckbox.IsChecked.Value);
-				LoggerUtils.LogString("Generando equipo desde Proballers -> URL: " + UrlTextBox.Text + ". Puntero equipo: " + PunteroEquipo.Text + ". Puntero primer jugador: " + PunteroJugador.Text);
-			}
-			catch (Exception)
-			{
-				MessageBox.Show("Error al generar equipo. Compruebe la URL e inténtelo de nuevo.", "Generar equipo", MessageBoxButton.OK, MessageBoxImage.Error);
-				return;
-			}
-
-			var ventEquipo = new EquipoWindow(equipoGen);
-			ventEquipo.Show();
-		}
-
-		private void Button_Click_1(object sender, RoutedEventArgs e)
-		{
-			using (var fbd = new FolderBrowserDialog())
-			{
-				DialogResult result = fbd.ShowDialog();
-
-				if (result == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
-				{
-					var ruta = fbd.SelectedPath.Replace("\\", @"\\");
-					RutaTextBox.Text = ruta;
-					Settings.Default.Path = ruta;
-					Settings.Default.Save();
-					DbdatUtils.PcbPath = ruta;
-				}
+				WindowStyle = WindowStyle.SingleBorderWindow;
+				WindowState = WindowState.Maximized;
+				WindowStyle = WindowStyle.None;
 			}
 		}
 
-		private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
+		#endregion
+
+		private void Window_MouseDown(object sender, MouseButtonEventArgs e)
 		{
-			Regex regex = new Regex("[^0-9]+");
-			e.Handled = regex.IsMatch(e.Text);
+			Keyboard.ClearFocus();
+			MainRegion.Focus();
 		}
 
-		private void PhotosCheckbox_Changed(object sender, RoutedEventArgs e)
+		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			warningLabel.Visibility = PhotosCheckbox.IsChecked.Value
-				? Visibility.Visible 
-				: Visibility.Hidden;	
+			MaximizeWindow();
 		}
 	}
 }

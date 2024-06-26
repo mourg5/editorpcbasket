@@ -1,12 +1,12 @@
 ﻿using EpcbModel;
 using EpcbUtils;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using Prism.Commands;
+using Prism.Mvvm;
 using System.ComponentModel;
 
 namespace Editor_PCBasket___Mou.ViewModels
 {
-	public class EquipoViewModel : ViewModelBase, INotifyPropertyChanged
+	public class EquipoViewModel : BindableBase
 	{
 		public EquipoViewModel(Equipo equipo)
 		{
@@ -17,18 +17,18 @@ namespace Editor_PCBasket___Mou.ViewModels
 		public Equipo Equipo
 		{
 			get { return _equipo; }
-			set { Set(() => Equipo, ref _equipo, value); }
+			set { SetProperty(ref _equipo, value); }
 		}
 
-		private RelayCommand _generateDbcCommand;
+		private DelegateCommand _generateDbcCommand;
 
-		public RelayCommand GenerateDbcCommand
+		public DelegateCommand GenerateDbcCommand
 		{
 			get
 			{
 				if (_generateDbcCommand == null)
 				{
-					_generateDbcCommand = new RelayCommand(ExecuteGenerateDbc, CanExecuteGenerateDbc);
+					_generateDbcCommand = new DelegateCommand(ExecuteGenerateDbc, CanExecuteGenerateDbc);
 				}
 				return _generateDbcCommand;
 			}
@@ -52,29 +52,29 @@ namespace Editor_PCBasket___Mou.ViewModels
 			Equipo.ReloadMedias();
 		}
 
-		private RelayCommand _saveEquipoCommand;
+		private DelegateCommand _saveEquipoCommand;
 
-		public RelayCommand SaveEquipoCommand
+		public DelegateCommand SaveEquipoCommand
 		{
 			get
 			{
 				if (_saveEquipoCommand == null)
 				{
-					_saveEquipoCommand = new RelayCommand(ExecuteSaveEquipo, CanExecuteSaveEquipo);
+					_saveEquipoCommand = new DelegateCommand(ExecuteSaveEquipo, CanExecuteSaveEquipo);
 				}
 				return _saveEquipoCommand;
 			}
 		}
 
-		private RelayCommand _subirMediaCommand;
+		private DelegateCommand _subirMediaCommand;
 
-		public RelayCommand SubirMediaCommand
+		public DelegateCommand SubirMediaCommand
 		{
 			get
 			{
 				if (_subirMediaCommand == null)
 				{
-					_subirMediaCommand = new RelayCommand(ExecuteSubirMedia, CanExecuteSubirMedia);
+					_subirMediaCommand = new DelegateCommand(ExecuteSubirMedia, CanExecuteSubirMedia);
 				}
 				return _subirMediaCommand;
 			}
@@ -96,15 +96,15 @@ namespace Editor_PCBasket___Mou.ViewModels
 			return true;
 		}
 
-		private RelayCommand _bajarMediaCommand;
+		private DelegateCommand _bajarMediaCommand;
 
-		public RelayCommand BajarMediaCommand
+		public DelegateCommand BajarMediaCommand
 		{
 			get
 			{
 				if (_bajarMediaCommand == null)
 				{
-					_bajarMediaCommand = new RelayCommand(ExecuteBajarMedia, CanExecuteBajarMedia);
+					_bajarMediaCommand = new DelegateCommand(ExecuteBajarMedia, CanExecuteBajarMedia);
 				}
 				return _bajarMediaCommand;
 			}

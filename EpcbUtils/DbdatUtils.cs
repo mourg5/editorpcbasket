@@ -19,12 +19,11 @@ namespace EpcbUtils
 
 		public static BitmapImage GetBanderaBitmap(Pais pais)
 		{
-			var uri = new Uri(string.Format("{0}\\DBDAT\\BANDERAS\\MINI\\BAN{1}.bmp", PcbPathForBitmaps, ((int)pais).ToString("0000")));
-
 			BitmapImage bandera;
 
 			try
 			{
+				var uri = new Uri(string.Format("{0}\\DBDAT\\BANDERAS\\MINI\\BAN{1}.bmp", PcbPathForBitmaps, ((int)pais).ToString("0000")));
 				bandera = new BitmapImage(uri);
 			}
 			catch (Exception)
@@ -37,10 +36,10 @@ namespace EpcbUtils
 
 		public static BitmapImage GetMinifoto(int puntero)
 		{
-			var uri = new Uri(string.Format("{0}\\DBDAT\\MINIFOTO\\JUG{1}.bmp", PcbPathForBitmaps, puntero.ToString("00000")));
 			BitmapImage foto;
 			try
 			{
+				var uri = new Uri(string.Format("{0}\\DBDAT\\MINIFOTO\\JUG{1}.bmp", PcbPathForBitmaps, puntero.ToString("00000")));
 				foto = new BitmapImage(uri);
 			}
 			catch (Exception)

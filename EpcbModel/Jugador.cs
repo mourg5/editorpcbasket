@@ -1,13 +1,10 @@
-﻿using GalaSoft.MvvmLight;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Prism.Mvvm;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EpcbModel
 {
-	public class Jugador : ViewModelBase
+	[Table("Jugadores")]
+	public class Jugador : BindableBase
 	{
 		public Jugador()
 		{
@@ -22,7 +19,7 @@ namespace EpcbModel
 			get { return _puntero; }
 			set
 			{
-				if (!Set(() => Puntero, ref _puntero, value)) return;
+				if (!SetProperty(ref _puntero, value)) return;
 			}
 		}
 
@@ -32,7 +29,7 @@ namespace EpcbModel
 			get { return _dorsal; }
 			set
 			{
-				Set(() => Dorsal, ref _dorsal, value);
+				SetProperty(ref _dorsal, value);
 			}
 		}
 
@@ -41,7 +38,7 @@ namespace EpcbModel
 		public string NombreCorto
 		{
 			get { return _nombreCorto; }
-			set { Set(() => NombreCorto, ref _nombreCorto, value); }
+			set { SetProperty(ref _nombreCorto, value); }
 		}
 
 		private string _nombreLargo;
@@ -49,7 +46,7 @@ namespace EpcbModel
 		public string NombreLargo
 		{
 			get { return _nombreLargo; }
-			set { Set(() => NombreLargo, ref _nombreLargo, value); }
+			set { SetProperty(ref _nombreLargo, value); }
 		}
 
 		private Pais _nacionalidad;
@@ -58,7 +55,7 @@ namespace EpcbModel
 			get { return _nacionalidad; }
 			set
 			{
-				if (!Set(() => Nacionalidad, ref _nacionalidad, value)) return;
+				if (!SetProperty(ref _nacionalidad, value)) return;
 			}
 		}
 
@@ -66,42 +63,42 @@ namespace EpcbModel
 		public int Demarcacion
 		{
 			get { return _demarcacion; }
-			set { Set(() => Demarcacion, ref _demarcacion, value); }
+			set { SetProperty(ref _demarcacion, value); }
 		}
 
 		private int _anoNacimiento;
 		public int AnoNacimiento
 		{
 			get { return _anoNacimiento; }
-			set { Set(() => AnoNacimiento, ref _anoNacimiento, value); }
+			set { SetProperty(ref _anoNacimiento, value); }
 		}
 
 		private bool _colorPiel;
 		public bool ColorPiel
 		{
 			get { return _colorPiel; }
-			set { Set(() => ColorPiel, ref _colorPiel, value); }
+			set { SetProperty(ref _colorPiel, value); }
 		}
 
 		private int _altura;
 		public int Altura
 		{
 			get { return _altura; }
-			set { Set(() => Altura, ref _altura, value); }
+			set { SetProperty(ref _altura, value); }
 		}
 
 		private int _peso;
 		public int Peso
 		{
 			get { return _peso; }
-			set { Set(() => Peso, ref _peso, value); }
+			set { SetProperty(ref _peso, value); }
 		}
 
 		private Medias _medias;
 		public Medias Medias
 		{
 			get { return _medias; }
-			set { Set(() => Medias, ref _medias, value); }
+			set { SetProperty(ref _medias, value); }
 		}
 	}
 }

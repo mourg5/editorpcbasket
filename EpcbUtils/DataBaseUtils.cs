@@ -1,21 +1,19 @@
 ﻿using EpcbModel;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace EpcbUtils
 {
 	public static class DataBaseUtils
 	{
-		public static PcBasketContext DataBase = new PcBasketContext();
+		public static PcBasketContext DataBase;
 
 		public static Equipo GetEquipo(int puntero)
 		{
-			return DataBase.GetEquipo(puntero);
+			var equipo = DataBase.GetEquipo(puntero);
+			return equipo;
 		}
 
 		public static void CreateInitialDataBase()

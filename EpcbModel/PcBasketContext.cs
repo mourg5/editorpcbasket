@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EpcbModel
 {
@@ -20,7 +16,7 @@ namespace EpcbModel
 
 		public Equipo GetEquipo(int puntero)
 		{
-			return Equipos.Where(e => e.Puntero == puntero).FirstOrDefault();
+			return Equipos.Where(e => e.Puntero == puntero).Include("Plantilla").FirstOrDefault();
 		}
 
 		public Equipo GetEquipoOfJugador(Jugador jug)

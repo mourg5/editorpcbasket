@@ -33,7 +33,6 @@ namespace EpcbUtils
 			}
 		}
 
-		// TODO: revisar
 		public static void ChangeStartingYear(int startingYear)
 		{
 			FileStream manager = null;

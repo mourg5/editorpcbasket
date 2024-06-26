@@ -124,12 +124,19 @@ namespace Editor_PCBasket___Mou.Views
 			return curIndex;
 		}
 
-		private void ComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+		private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			BanderaImage.Source = DbdatUtils.GetBanderaBitmap((Pais)NacionalidadComboBox.SelectedItem);
+			try
+			{
+				BanderaImage.Source = DbdatUtils.GetBanderaBitmap((Pais)NacionalidadComboBox.SelectedItem);
+			}
+			catch (Exception)
+			{
+				// ignored
+			}
 		}
 
-		private void PunteroTextBoxTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+		private void PunteroTextBoxTextChanged(object sender, TextChangedEventArgs e)
 		{
 			if (string.IsNullOrEmpty(PunteroTextBox.Text)) return;
 
