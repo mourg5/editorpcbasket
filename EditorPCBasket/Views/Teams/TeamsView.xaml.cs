@@ -21,7 +21,7 @@ namespace Editor_PCBasket___Mou.Views.Teams
 			var equipo = EquiposDataGrid.SelectedItem as Equipo;
 			if (equipo != null)
 			{
-				var equipoWindow = new EquipoWindow(equipo);
+				var equipoWindow = new EquipoView(equipo);
 				equipoWindow.Show();
 			}
 		}

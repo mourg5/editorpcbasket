@@ -1,18 +1,48 @@
 ﻿using Editor_PCBasket___Mou.Services;
 using Prism.Commands;
 using Prism.Regions;
+using System.Threading;
+using System.Windows.Threading;
+using System;
 using static Editor_PCBasket___Mou.Config.NavigationEnums;
+using System.Windows;
+using EpcbUtils.Dialogs;
+using EpcbUtils;
+using Prism.Unity;
+using Prism.Ioc;
 
 namespace Editor_PCBasket___Mou.ViewModels
 {
 	public class MainMenuViewModel : INavigationAware
 	{
 		private INavigationService _navigationService;
+
 		public MainMenuViewModel(INavigationService navigationService)
 		{
 			_navigationService = navigationService;
-
 			InitializeCommands();
+
+			Application.Current.Dispatcher.Invoke(new Action(() =>
+			{
+				DialogHelper.ShowWaitingDialog("Cargando componentes, espere por favor...");
+			}), DispatcherPriority.Send);
+
+			var thread = new Thread(InitializeDbThread);
+			thread.Start();
+		}
+
+		private void InitializeDbThread()
+		{
+			try
+			{
+				var db = ((PrismApplication)App.Current).Container.Resolve<IDatabaseService>();
+				DialogHelper.CloseDialog();
+			}
+			catch (Exception ex)
+			{
+				DialogHelper.CloseDialog();
+				LoggerUtils.LogException(ex);
+			}
 		}
 
 		#region Commands

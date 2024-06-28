@@ -1,6 +1,7 @@
 ﻿using EpcbModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace Editor_PCBasket___Mou.Services
 {
@@ -18,7 +19,7 @@ namespace Editor_PCBasket___Mou.Services
 
 		int GetNumberOfPlayers();
 
-		void GenerateInitialDatabase();
+		Task GenerateInitialDatabase();
 		void Reset();
 	}
 }

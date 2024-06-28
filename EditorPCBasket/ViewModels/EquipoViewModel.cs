@@ -1,16 +1,18 @@
-﻿using EpcbModel;
+﻿using Editor_PCBasket___Mou.Services;
+using EpcbModel;
 using EpcbUtils;
 using Prism.Commands;
 using Prism.Mvvm;
-using System.ComponentModel;
 
 namespace Editor_PCBasket___Mou.ViewModels
 {
 	public class EquipoViewModel : BindableBase
 	{
-		public EquipoViewModel(Equipo equipo)
+		private IDatabaseService _databaseService { get; set; }
+
+		public EquipoViewModel(IDatabaseService databaseService)
 		{
-			Equipo = equipo;
+			_databaseService = databaseService;
 		}
 
 		private Equipo _equipo;
@@ -142,8 +144,8 @@ namespace Editor_PCBasket___Mou.ViewModels
 
 		private void ExecuteSaveEquipo()
 		{
-			LoggerUtils.LogString("Guardando equipo '" + Equipo.NombreCorto + "' en la base de datos...");
-			DataBaseUtils.GuardarEquipo(Equipo);
+			_databaseService.AddTeam(Equipo);
+			LoggerUtils.LogString("Guardando equipo '" + Equipo.NombreCorto + "' en la base de datos...");			
 		}
 
 		private bool CanExecuteSaveEquipo()

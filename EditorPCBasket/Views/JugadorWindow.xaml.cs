@@ -10,17 +10,19 @@ namespace Editor_PCBasket___Mou.Views
 	/// <summary>
 	/// Lógica de interacción para JugadorWindow.xaml
 	/// </summary>
-	public partial class JugadorWindow
+	public partial class JugadorView
 	{
-		public JugadorWindow(Jugador jugador)
+		private Jugador _player;
+
+		public JugadorView(Jugador player)
 		{
-			InitializeComponent();
-			DataContext = new JugadorViewModel(jugador);
+            _player = player;
+            InitializeComponent();
 		}
-		public JugadorWindow()
+		public JugadorView()
 		{
+			_player = new Jugador();
 			InitializeComponent();
-			DataContext = new JugadorViewModel();
 		}
 		private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
 		{
@@ -29,7 +31,7 @@ namespace Editor_PCBasket___Mou.Views
 		}
 		private void ComboBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
 		{
-			if (NacionalidadComboBox.SelectedItem == null) return;
+			if (NacionalidadComboBox.SelectedItem == null || BanderaImage == null) return;
 
 			BanderaImage.Source = DbdatUtils.GetBanderaBitmap((Pais)NacionalidadComboBox.SelectedItem);
 		}
@@ -38,8 +40,14 @@ namespace Editor_PCBasket___Mou.Views
 		{
 			if (string.IsNullOrEmpty(PunteroTextBox.Text)) return;
 
-			FotoImage.Source = DbdatUtils.GetMedfoto(int.Parse(PunteroTextBox.Text));
+			SetFoto();
 		}
+
+		private void SetFoto()
+		{
+			if (FotoImage == null) return;
+            FotoImage.Source = DbdatUtils.GetMedfoto(int.Parse(PunteroTextBox.Text));
+        }
 
 		private void AceptarClick(object sender, System.Windows.RoutedEventArgs e)
 		{
@@ -51,5 +59,17 @@ namespace Editor_PCBasket___Mou.Views
 		{
 			this.Close();
 		}
-	}
+
+		private void JugadorWindowDataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+		{
+			var jugadorViewModel = DataContext as JugadorViewModel;
+			if(jugadorViewModel == null) return;
+			jugadorViewModel.Jugador = _player;
+		}
+
+		private void Window_Loaded(object sender, System.Windows.RoutedEventArgs e)
+		{
+			SetFoto();
+        }
+    }
 }

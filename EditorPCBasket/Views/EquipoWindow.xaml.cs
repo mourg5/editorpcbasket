@@ -2,36 +2,29 @@
 using EpcbModel;
 using EpcbUtils;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Editor_PCBasket___Mou.Views
 {
 	/// <summary>
 	/// Lógica de interacción para EquipoWindow.xaml
 	/// </summary>
-	public partial class EquipoWindow
+	public partial class EquipoView
 	{
-		public EquipoWindow(Equipo equipo)
+		private Equipo _team;
+
+		public EquipoView(Equipo team)
 		{
+			_team = team;
 			InitializeComponent();
-			DataContext = new EquipoViewModel(equipo);
 		}
 
-		public EquipoWindow()
+		public EquipoView()
 		{
 			InitializeComponent();
 		}
@@ -126,19 +119,26 @@ namespace Editor_PCBasket___Mou.Views
 
 		private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			try
-			{
-				BanderaImage.Source = DbdatUtils.GetBanderaBitmap((Pais)NacionalidadComboBox.SelectedItem);
-			}
-			catch (Exception)
-			{
-				// ignored
-			}
+			SetFlag();
+		}
+
+		private void SetFlag()
+		{
+			if (BanderaImage == null || NacionalidadComboBox.SelectedItem == null) return;
+
+			BanderaImage.Source = DbdatUtils.GetBanderaBitmap((Pais)NacionalidadComboBox.SelectedItem);
 		}
 
 		private void PunteroTextBoxTextChanged(object sender, TextChangedEventArgs e)
 		{
 			if (string.IsNullOrEmpty(PunteroTextBox.Text)) return;
+
+			SetEscudos();
+		}
+
+		private void SetEscudos()
+		{
+			if (Image3Desc == null) return;
 
 			Image3Desc.Source = DbdatUtils.Get3Desc(int.Parse(PunteroTextBox.Text));
 			ImageMiniesc.Source = DbdatUtils.GetMiniesc(int.Parse(PunteroTextBox.Text));
@@ -152,7 +152,7 @@ namespace Editor_PCBasket___Mou.Views
 
 			if (jugador == null) return;
 
-			var jugWindow = new JugadorWindow(jugador);
+			var jugWindow = new JugadorView(jugador);
 			jugWindow.Closed += JugWindow_Closed;
 			jugWindow.Show();
 		}
@@ -180,7 +180,7 @@ namespace Editor_PCBasket___Mou.Views
 				return;
 			}
 
-			var jugW = new JugadorWindow();
+			var jugW = new JugadorView();
 			jugW.Closing += JugW_Closing;
 			jugW.ButtonsStackPanel.Visibility = Visibility.Visible;
 			jugW.Show();
@@ -188,12 +188,25 @@ namespace Editor_PCBasket___Mou.Views
 
 		private void JugW_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
-			var jugVM = ((JugadorWindow)sender).DataContext as JugadorViewModel;
+			var jugVM = ((JugadorView)sender).DataContext as JugadorViewModel;
 
 			if (jugVM == null || !jugVM.ApplyChanges) return;
 
 			((EquipoViewModel)DataContext).Equipo.Plantilla.Add(jugVM.Jugador);
 			LoggerUtils.LogString(string.Format("El jugador {0} se ha añadido a la plantilla de {1}", jugVM.Jugador.NombreLargo, ((EquipoViewModel)DataContext).Equipo.NombreCorto));
+		}
+
+		private void EquipoWindowDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+		{
+			var equipoViewModel = DataContext as EquipoViewModel;
+			if(equipoViewModel == null) return;
+			equipoViewModel.Equipo = _team;
+		}
+
+		private void Window_Loaded(object sender, RoutedEventArgs e)
+		{
+			SetFlag();
+			SetEscudos();
 		}
 	}
 }

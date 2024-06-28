@@ -1,4 +1,5 @@
-﻿using EpcbModel;
+﻿using Editor_PCBasket___Mou.Services;
+using EpcbModel;
 using EpcbUtils;
 using Prism.Commands;
 using Prism.Mvvm;
@@ -9,27 +10,13 @@ namespace Editor_PCBasket___Mou.ViewModels
 {
 	public class JugadorViewModel : BindableBase
 	{
-		public JugadorViewModel()
+		public JugadorViewModel(IDatabaseService databaseService)
 		{
-			Jugador = new Jugador();
-			MediaDeseada = 70;
-			Jugador.Nacionalidad = Pais.LUXEMBURGO;
-			_random = new Random(DateTime.Now.Millisecond);
-		}
-		public JugadorViewModel(Jugador jugador)
-		{
-			Jugador = jugador;
-
+			_jugador = new Jugador();
 			MediaDeseada = 70;
 			_random = new Random(DateTime.Now.Millisecond);
-			NombreEquipo = "Libre";
 
-			var equipo = DataBaseUtils.DataBase.GetEquipoOfJugador(jugador);
-
-			if (equipo == null) return;
-
-			NombreEquipo = equipo.NombreLargo;
-			EscudoImageSource = DbdatUtils.GetNanoesc(equipo.Puntero);
+			_databaseService = databaseService;
 		}
 
 		public bool ApplyChanges = false;
@@ -47,14 +34,24 @@ namespace Editor_PCBasket___Mou.ViewModels
 		public BitmapImage EscudoImageSource
 		{
 			get { return _escudoImageSource; }
-			set { SetProperty(	ref _escudoImageSource, value); }
+			set { SetProperty(ref _escudoImageSource, value); }
 		}
 
 		private Jugador _jugador;
 		public Jugador Jugador
 		{
 			get { return _jugador; }
-			set { SetProperty(ref _jugador, value); }
+			set
+			{
+				if(!SetProperty(ref _jugador, value)) return;
+
+				var equipo = _databaseService.DataBase.GetEquipoOfJugador(Jugador);
+
+				if (equipo == null) return;
+
+				NombreEquipo = equipo.NombreLargo;
+				EscudoImageSource = DbdatUtils.GetNanoesc(equipo.Puntero);
+			}
 		}
 
 		private BitmapImage _banderaImageSource;
@@ -363,7 +360,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 		public bool IsIntimidador
 		{
 			get { return _isIntimidador; }
-			set { SetProperty(	ref _isIntimidador, value); }
+			set { SetProperty(ref _isIntimidador, value); }
 		}
 
 		private bool _isTirador;
@@ -403,6 +400,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 		}
 
 		private Random _random;
+		private readonly IDatabaseService _databaseService;
 
 		#endregion
 	}

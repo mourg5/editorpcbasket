@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="Editor_PCBasket___Mou.Views.Dialogs.WaitingDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <Grid Margin="20" MaxWidth="800">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <TextBlock Text="{Binding Title}" 
+                   Margin="0,0,0,5"
+                   FontSize="18" Foreground="{DynamicResource MaterialDesign.Brush.Primary.Dark}" 
+                   HorizontalAlignment="Center"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <materialDesign:PackIcon Kind="{Binding Icon}" 
+                                     Margin="0,0,10,0"
+                                     VerticalAlignment="Center" 
+                                     Width="{Binding IconSize}" Height="{Binding IconSize}" 
+                                     Foreground="{DynamicResource MaterialDesign.Brush.Primary.Dark}" />
+            <TextBlock Text="{Binding DialogMessage}"
+                       VerticalAlignment="Center"
+                       TextWrapping="Wrap"
+                       Grid.Column="1"
+                       Margin="10"
+                       FontSize="14" />
+        </Grid>
+        <ProgressBar IsIndeterminate="True" Grid.Row="2" Margin="20"/>
+    </Grid>
+</UserControl>

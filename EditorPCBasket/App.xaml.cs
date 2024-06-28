@@ -35,18 +35,12 @@ namespace Editor_PCBasket___Mou
 			};
 
 			SetFolders();
-			InitializeDataBase();
 
 			HexUtils.AnoInicio = (short)Settings.Default.AnoInicio;
 
 			LoggerUtils.LogString(string.Format("============= Iniciando Editor PCBasket. Versión {0} =============", Assembly.GetExecutingAssembly().GetName().Version));
 
 			Container.Resolve<INavigationService>().NavigateTo(NavigationRegion.MainRegion, NavigationView.MainMenuView, this);
-		}
-
-		private void InitializeDataBase()
-		{
-			DataBaseUtils.DataBase = Container.Resolve<IDatabaseService>().DataBase;
 		}
 
 		private static void SetFolders()

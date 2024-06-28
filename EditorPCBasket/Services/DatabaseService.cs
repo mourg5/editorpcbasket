@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 
 namespace Editor_PCBasket___Mou.Services
 {
@@ -24,26 +25,18 @@ namespace Editor_PCBasket___Mou.Services
 
 		#region DB Creation
 
-		public void GenerateInitialDatabase()
+		public async Task GenerateInitialDatabase()
 		{
 			try
 			{
 				Reset();
 
-				foreach (var dbc in Directory.GetFiles(Properties.Settings.Default.Path + "\\DBDAT\\EQ022022"))
-				{
-					using (var eqFile = File.OpenRead(dbc))
-					{
-						var equipo = HexUtils.ReadEquipoBytes(eqFile);
-						if (equipo.Puntero == -5) continue;
-						if (DataBase.Equipos.Where(e => e.Puntero == equipo.Puntero).Any())
-						{
-							DataBase.Equipos.Remove(DataBase.Equipos.Where(e => e.Puntero == equipo.Puntero).FirstOrDefault());
-						}
-						DataBase.Equipos.Add(equipo);
-					}
-				}
+				var tcs = new TaskCompletionSource<List<Equipo>>(TaskCreationOptions.RunContinuationsAsynchronously);
 
+				await CreateTeams(tcs);
+				await tcs.Task;
+
+				DataBase.Equipos.AddRange(tcs.Task.Result);
 				DataBase.SaveChanges();
 
 				TeamsList = new ObservableCollection<Equipo>(GetTeams().ToList().OrderBy(e => e.Puntero));
@@ -52,6 +45,24 @@ namespace Editor_PCBasket___Mou.Services
 			{
 				LoggerUtils.LogException(ex);
 			}
+		}
+
+		public Task CreateTeams(TaskCompletionSource<List<Equipo>> teamList)
+		{
+			var equiposList = new List<Equipo>();
+
+			foreach (var dbc in Directory.GetFiles(Properties.Settings.Default.Path + "\\DBDAT\\EQ022022"))
+			{
+				using (var eqFile = File.OpenRead(dbc))
+				{
+					var equipo = HexUtils.ReadEquipoBytes(eqFile);
+					if (equipo.Puntero == -5) continue;
+					equiposList.Add(equipo);
+				}
+			}
+
+			teamList.SetResult(equiposList);
+			return Task.CompletedTask;
 		}
 
 		public void Reset()
@@ -82,10 +93,24 @@ namespace Editor_PCBasket___Mou.Services
 
 		public void DeleteTeam(Equipo team)
 		{
-			DataBase.Equipos.Remove(team);
-			DataBase.SaveChanges();
+			try
+			{
+				DataBase.Equipos.Remove(team);
+				DataBase.SaveChanges();
+			}
+			catch (Exception ex)
+			{
+				LoggerUtils.LogException(ex);			
+			}
 
-			TeamsList.Remove(team);
+			try
+			{
+				TeamsList.Remove(team);
+			}
+			catch (Exception ex)
+			{
+				LoggerUtils.LogException(ex);
+			}
 		}
 
 		public void AddTeam(Equipo team)
@@ -93,6 +118,7 @@ namespace Editor_PCBasket___Mou.Services
 			if (!DataBase.Equipos.Where(p => p.Puntero == team.Puntero).Any())
 			{
 				DataBase.Equipos.Add(team);
+				TeamsList.Add(team);
 			}
 
 			DataBase.SaveChanges();

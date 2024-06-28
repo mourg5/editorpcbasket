@@ -3,6 +3,13 @@ using static Editor_PCBasket___Mou.Config.NavigationEnums;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows;
+using EpcbUtils.Dialogs;
+using Editor_PCBasket___Mou.ViewModels.Dialogs;
+using MaterialDesignThemes.Wpf;
+using System.Threading.Tasks;
+using System.Windows.Threading;
+using System;
+using EpcbUtils;
 
 namespace Editor_PCBasket___Mou
 {
@@ -17,7 +24,77 @@ namespace Editor_PCBasket___Mou
 		{
 			InitializeComponent();
 			_navigationService = navigationService;
+
+			DialogHelper.OnShowDialog += DialogHelper_ShowDialog;
+			DialogHelper.OnShowDialogOnUiThread += DialogHelper_ShowDialogOnUiThread;
+			DialogHelper.OnCloseDialog += DialogHelper_OnCloseDialogs;
 		}
+
+		#region Dialog Host
+
+		private async Task<object> DialogHelper_ShowDialog(object sender, DialogOptions dialogOptions, object args)
+		{
+			object result = null;
+			await Application.Current.Dispatcher.InvokeAsync(new Action(async () =>
+			{
+				object dialog;
+				switch (dialogOptions.Type)
+				{
+					case DialogEnums.DialogType.SimpleDialog:
+						dialog = new SimpleDialogViewModel(dialogOptions);
+						break;
+					case DialogEnums.DialogType.InputDialog:
+						dialog = new InputDialogViewModel(dialogOptions);
+						break;
+					default:
+						dialog = "";
+						break;
+				}
+
+				result = await DialogHost.Show(dialog, "RootDialog");
+			}), DispatcherPriority.Send);
+
+			return result;
+		}
+
+		private void DialogHelper_ShowDialogOnUiThread(object sender, DialogOptions options)
+		{
+			object dialog;
+
+			switch (options.Type)
+			{
+				case DialogEnums.DialogType.WaitingDialog:
+					dialog = new WaitingDialogViewModel(options);
+					RootDialog.CloseOnClickAway = false;
+					break;
+				default:
+					dialog = new SimpleDialogViewModel(options);
+					break;
+			}
+
+			Application.Current.Dispatcher.Invoke(new Action(() =>
+			{
+				DialogHost.Show(dialog, "RootDialog");
+			}), DispatcherPriority.Send);
+		}
+
+		private void DialogHelper_OnCloseDialogs(object sender, EventArgs e)
+		{
+			Dispatcher.Invoke(new Action(() =>
+			{
+				try
+				{
+					DialogHost.Close("RootDialog");
+					RootDialog.CloseOnClickAway = true;
+				}
+				catch (Exception)
+				{
+					RootDialog.CloseOnClickAway = true;
+				}
+			}));
+		}
+
+		#endregion
 
 		#region Appbar buttons
 

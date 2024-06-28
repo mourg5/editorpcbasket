@@ -83,7 +83,7 @@ namespace Editor_PCBasket___Mou.ViewModels.Teams
 		private void ExecuteCreateTeam()
 		{
 			var team = new Equipo();
-			var teamWindow = new EquipoWindow(team);
+			var teamWindow = new EquipoView(team);
 			teamWindow.Show();
 		}
 

@@ -1,11 +1,15 @@
 ﻿using Editor_PCBasket___Mou.Services;
+using EpcbUtils;
+using EpcbUtils.Dialogs;
 using Ookii.Dialogs.Wpf;
 using Prism.Commands;
 using Prism.Mvvm;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
+using System.Windows.Threading;
 using static Editor_PCBasket___Mou.Config.NavigationEnums;
 
 namespace Editor_PCBasket___Mou.ViewModels.Settings
@@ -143,8 +147,28 @@ namespace Editor_PCBasket___Mou.ViewModels.Settings
 
 		private void ExecuteGenerateDb()
 		{
-			_databaseService.GenerateInitialDatabase();
-			CheckDatabase();
+			Application.Current.Dispatcher.Invoke(new Action(() =>
+			{
+				DialogHelper.ShowWaitingDialog("Generando BBDD, espere por favor...");
+			}), DispatcherPriority.Send);
+
+			var thread = new Thread(GenerateDbThread);
+			thread.Start();
+		}
+
+		private void GenerateDbThread()
+		{
+			try
+			{
+				_databaseService.GenerateInitialDatabase();
+				DialogHelper.CloseDialog();
+				CheckDatabase();
+			}
+			catch (Exception ex)
+			{
+				DialogHelper.CloseDialog();
+				LoggerUtils.LogException(ex);
+			}
 		}
 
 		private void ExecuteSelectPath()
