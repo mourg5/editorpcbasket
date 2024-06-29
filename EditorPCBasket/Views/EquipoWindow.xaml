@@ -32,7 +32,6 @@
         <GroupBox Header="Datos del equipo"  Margin="5">
             <StackPanel>
                 <TextBox Margin="5" materialDesign:HintAssist.Hint="Puntero"  Width="55"
-                         BorderBrush="{DynamicResource AccentColorBrush}"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
                          Name="PunteroTextBox"
                          HorizontalAlignment="Left"
@@ -41,12 +40,10 @@
                 <TextBox Margin="5" Width="220" materialDesign:HintAssist.Hint="Nombre Corto" 
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
                          HorizontalAlignment="Left"
-                         BorderBrush="{DynamicResource AccentColorBrush}"
                          Text="{Binding Equipo.NombreCorto}"/>
                 <TextBox Margin="5" materialDesign:HintAssist.Hint="Nombre Largo" 
                          HorizontalAlignment="Stretch"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
-                         BorderBrush="{DynamicResource AccentColorBrush}"
                          Text="{Binding Equipo.NombreLargo}"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                     <ComboBox Margin="5"  materialDesign:HintAssist.Hint="País"      
@@ -68,24 +65,20 @@
                 <TextBox Margin="5" Width="220" materialDesign:HintAssist.Hint="Entrenador" 
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
                          HorizontalAlignment="Left"
-                         BorderBrush="{DynamicResource AccentColorBrush}"
                          Text="{Binding Equipo.Entrenador}"/>
                 <TextBox Margin="5" Width="220" materialDesign:HintAssist.Hint="Pabellón" 
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
                          HorizontalAlignment="Left"
-                         BorderBrush="{DynamicResource AccentColorBrush}"
                          Text="{Binding Equipo.Pabellon}"/>
                 <TextBox Margin="5" Width="80" materialDesign:HintAssist.Hint="Aforo" 
                          PreviewTextInput="NumberValidationTextBox"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
                          HorizontalAlignment="Left"
-                         BorderBrush="{DynamicResource AccentColorBrush}"
                          Text="{Binding Equipo.Aforo}"/>
                 <TextBox Margin="5" Width="80" materialDesign:HintAssist.Hint="Presupuesto" 
                          PreviewTextInput="NumberValidationTextBox"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
                          HorizontalAlignment="Left"
-                         BorderBrush="{DynamicResource AccentColorBrush}"
                          Text="{Binding Equipo.Presupuesto}"/>
                 <GroupBox Header="Escudos" Margin="5">
                     <StackPanel>
@@ -101,19 +94,19 @@
                             </Grid.ColumnDefinitions>
                             <StackPanel>
                                 <Label Content="MINIESC" HorizontalAlignment="Center"/>
-                                <Border BorderBrush="{DynamicResource AccentColorBrush}" BorderThickness="1" Width="54" Height="70">
+                                <Border BorderBrush="{DynamicResource MaterialDesign.Brush.Badged.DarkForeground}" BorderThickness="1" Width="54" Height="70">
                                     <Image Name="ImageMiniesc" />
                                 </Border>
                             </StackPanel>
                             <StackPanel Grid.Column="1">
                                 <Label Content="NANOESC" HorizontalAlignment="Center"/>
-                                <Border BorderBrush="{DynamicResource AccentColorBrush}" BorderThickness="1" Width="30" Height="30">
+                                <Border BorderBrush="{DynamicResource MaterialDesign.Brush.Badged.DarkForeground}" BorderThickness="1" Width="30" Height="30">
                                     <Image Name="ImageNanoesc" />
                                 </Border>
                             </StackPanel>
                             <StackPanel Grid.Column="2">
                                 <Label Content="RIDIESC" HorizontalAlignment="Center"/>
-                                <Border BorderBrush="{DynamicResource AccentColorBrush}" BorderThickness="1" Width="18" Height="18">
+                                <Border BorderBrush="{DynamicResource MaterialDesign.Brush.Badged.DarkForeground}" BorderThickness="1" Width="18" Height="18">
                                     <Image Name="ImageRidiesc" />
                                 </Border>
                             </StackPanel>

@@ -1,8 +1,89 @@
 ﻿<UserControl x:Class="Editor_PCBasket___Mou.Views.Manager.ManagerView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-             xmlns:local="clr-namespace:Editor_PCBasket___Mou.Views.Manager">
-    <Grid>
-            
-    </Grid>
+             xmlns:local="clr-namespace:Editor_PCBasket___Mou.Views.Manager" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Background="{DynamicResource MaterialDesign.Brush.Badged.LightBackground}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,40">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <GroupBox Margin="16" Style="{StaticResource MaterialDesignCardGroupBox}">
+                <GroupBox.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Tools" Width="32" Height="32" VerticalAlignment="Center"/>
+                            <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" 
+                                  Foreground="{DynamicResource MaterialDesign.Brush.Badged.DarkForeground}" 
+                                  Text="Herramientas" />
+                        </StackPanel>
+                    </DataTemplate>
+                </GroupBox.HeaderTemplate>
+                <Grid>
+                    <Grid.Resources>
+                        <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+                            <Setter Property="Width" Value="120"/>
+                            <Setter Property="Height" Value="120"/>
+                            <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Badged.DarkForeground}"/>
+                        </Style>
+                        <Style TargetType="materialDesign:PackIcon">
+                            <Setter Property="Width" Value="90"/>
+                            <Setter Property="Height" Value="90"/>
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel HorizontalAlignment="Center">
+                        <Button Command="{Binding SelectStartingYearCommand}">
+                            <materialDesign:PackIcon Kind="CalendarArrowRight"/>
+                        </Button>
+                        <Label Content="Seleccionar temporada de inicio"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                        <Button Command="{Binding RemoveAgeRestrictionCommand}">
+                            <materialDesign:PackIcon Kind="CalendarMultiselect" Width="90" />
+                        </Button>
+                        <Label Content="Eliminar 'Efecto 2000'"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                        <Button Command="{Binding DeleteTeamCommand}">
+                            <materialDesign:PackIcon Kind="DeleteForever" Width="90" />
+                        </Button>
+                        <Label Content="Borrar equipo"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="3" HorizontalAlignment="Center">
+                        <Button Command="{Binding ExportTeamsCommand}">
+                            <materialDesign:PackIcon Kind="DatabaseExportOutline" Width="90" />
+                        </Button>
+                        <Label Content="Exportar BBDD a PC Basket"/>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Margin="16" Style="{StaticResource MaterialDesignCardGroupBox}" Grid.Row="1">
+                <GroupBox.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="FormatListBulletedType" Width="32" Height="32" VerticalAlignment="Center"/>
+                            <TextBlock Margin="8,0,0,0" VerticalAlignment="Center"
+                                  Foreground="{DynamicResource MaterialDesign.Brush.Badged.DarkForeground}"
+                                  Text="Lista de equipos" />
+                        </StackPanel>
+                    </DataTemplate>
+                </GroupBox.HeaderTemplate>
+                
+            </GroupBox>
+        </Grid>
+    </ScrollViewer>
 </UserControl>

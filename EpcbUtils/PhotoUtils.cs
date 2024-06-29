@@ -27,17 +27,63 @@ namespace EpcbUtils
 			if (url.ToLower().Contains("defaut")) return;
 
 			var imageBytes = await _webClient.GetByteArrayAsync(url);
+			var playerFoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\{0}.jpg", jugador.Puntero));
+			File.WriteAllBytes(playerFoto, imageBytes);			
 
-			using (var ms = new MemoryStream(imageBytes))
-			{
-				var webFoto = Image.FromStream(ms);
-				CreatePcbFoto(jugador, webFoto, PhotoSize.MEDFOTO);
-				CreatePcbFoto(jugador, webFoto, PhotoSize.MINIFOTO);
-				CreatePcbFoto(jugador, webFoto, PhotoSize.NANOFOTO);
-			}
+			CreateFotoImageMagick(jugador.Puntero, PhotoSize.MEDFOTO);
+			CreateFotoImageMagick(jugador.Puntero, PhotoSize.MINIFOTO);
+			CreateFotoImageMagick(jugador.Puntero, PhotoSize.NANOFOTO);
 		}
 
-		private static void CreatePcbFoto(Jugador jugador, Image webFoto, PhotoSize format)
+		private static void CreateFotoImageMagick(int puntero, PhotoSize format)
+		{
+			string input = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\{0}.jpg", puntero));
+			string folder;
+			string size;
+			string crop;
+
+			switch (format)
+			{
+				case PhotoSize.MEDFOTO:
+					size = "89x89";
+					crop = "61x89+14+0";
+					folder = "MEDFOTO";
+					break;
+				case PhotoSize.MINIFOTO:
+					size = "41x41";
+					crop = "28x41+6+0";
+					folder = "MINIFOTO";
+					break;
+				case PhotoSize.NANOFOTO:
+					size = "27x27";
+					crop = "19x27+4+0";
+					folder = "NANOFOTO";
+					break;
+				default:
+					size = "89x89";
+					crop = "61x89+14+0";
+					folder = "MEDFOTO";
+					break;
+			}
+
+			var output = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\JUG{1:00000}.bmp", folder, puntero));
+			var palette = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Graficos\\palette.bmp");
+
+			var script = string.Format("/c magick {0} -resize {1} -crop {2} -type palette -compress none -remap {3} {4}", input, size, crop, palette, output);
+
+
+			Process process = new Process();
+			ProcessStartInfo startInfo = new ProcessStartInfo
+			{
+				WindowStyle = ProcessWindowStyle.Hidden,
+				FileName = "cmd.exe",
+				Arguments = script
+			};
+			process.StartInfo = startInfo;
+			process.Start();
+		}
+
+		private static void CreateFotoMspaint(Jugador jugador, Image webFoto, PhotoSize format)
 		{
 			Rectangle crop;
 			Size size;

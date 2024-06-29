@@ -2,6 +2,7 @@
 using Editor_PCBasket___Mou.Properties;
 using Editor_PCBasket___Mou.Services;
 using EpcbUtils;
+using ImageMagick;
 using Prism.Ioc;
 using Prism.Unity;
 using System;
@@ -35,6 +36,8 @@ namespace Editor_PCBasket___Mou
 			};
 
 			SetFolders();
+
+			MagickNET.Initialize();
 
 			HexUtils.AnoInicio = (short)Settings.Default.AnoInicio;
 
@@ -93,6 +96,13 @@ namespace Editor_PCBasket___Mou
 			{
 				var fileToDelete = orderedFiles.ElementAt(i);
 				File.Delete(fileToDelete.FullName);
+			}
+
+			var temp = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "Graficos\\tmp");
+			foreach (var tmpFile in temp.GetFileSystemInfos())
+			{
+				if (tmpFile.Name.EndsWith("pcb")) continue;
+				tmpFile.Delete();
 			}
 		}
 	}
