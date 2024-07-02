@@ -41,6 +41,8 @@ namespace Editor_PCBasket___Mou
 			PhotoUtils.InitializeColorTables();
 
 			HexUtils.AnoInicio = (short)Settings.Default.AnoInicio;
+			HexUtils.UseCotNationality = Settings.Default.UseCotNationality;
+			HexUtils.UseEurNationality = Settings.Default.UseEurNationality;
 
 			LoggerUtils.LogString(string.Format("============= Iniciando Editor PCBasket. Versión {0} =============", Assembly.GetExecutingAssembly().GetName().Version));
 
@@ -77,6 +79,31 @@ namespace Editor_PCBasket___Mou
 			Directory.CreateDirectory(miniescPath);
 			Directory.CreateDirectory(nanoescPath);
 			Directory.CreateDirectory(ridiescPath);
+
+			CreatePcbFolders();
+		}
+
+		private static void CreatePcbFolders()
+		{
+			var eqPath = Path.Combine(DbdatUtils.PcbPath, "DBDAT\\EQ022022");
+			var _3dEscPath = Path.Combine(DbdatUtils.PcbPath, "DBDAT\\3DESC");
+
+			if (!Directory.Exists(eqPath))
+			{
+				Directory.CreateDirectory(eqPath);
+			}
+
+			if (!Directory.Exists(_3dEscPath))
+			{
+				Directory.CreateDirectory(_3dEscPath);
+				Directory.CreateDirectory(Path.Combine(DbdatUtils.PcbPath, "DBDAT\\MINIESC"));
+				Directory.CreateDirectory(Path.Combine(DbdatUtils.PcbPath, "DBDAT\\NANOESC"));
+				Directory.CreateDirectory(Path.Combine(DbdatUtils.PcbPath, "DBDAT\\RIDIESC"));
+				Directory.CreateDirectory(Path.Combine(DbdatUtils.PcbPath, "DBDAT\\MEDFOTO"));
+				Directory.CreateDirectory(Path.Combine(DbdatUtils.PcbPath, "DBDAT\\MINIFOTO"));
+				Directory.CreateDirectory(Path.Combine(DbdatUtils.PcbPath, "DBDAT\\NANOFOTO"));
+
+			}
 		}
 
 		protected override void RegisterTypes(IContainerRegistry containerRegistry)

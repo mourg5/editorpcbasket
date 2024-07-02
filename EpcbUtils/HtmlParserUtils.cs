@@ -14,6 +14,8 @@ namespace EpcbUtils
 
 		public static Equipo GetEquipoFromHtml(string url, int pEquipo, int pJugador, bool generatePhotos, bool generateEscudos = false)
 		{
+			url = PrepareUrl(url);
+
 			var web = new HtmlWeb();
 			var doc = web.Load(url);
 
@@ -21,6 +23,14 @@ namespace EpcbUtils
 			{
 				Puntero = pEquipo
 			};
+
+			LoggerUtils.LogString(string.Format("[PARSER] Generating team from Proballers with url {0}", url));
+
+			if (generateEscudos)
+			{
+				var escudo = doc.DocumentNode.SelectSingleNode("//div[@class='identity__picture']").SelectSingleNode("img").Attributes["src"].Value;
+				PhotoUtils.CreateEscudos(escudo, pEquipo);
+			}
 
 			var nombreEquipo = doc.DocumentNode.SelectSingleNode("//div[@class='identity__picture']").SelectSingleNode("img").Attributes["alt"].Value;
 
@@ -64,13 +74,27 @@ namespace EpcbUtils
 				if (equipoRes.Plantilla.Count > 12) break;
 			}
 
-			if (generateEscudos)
-			{
-				var escudo = doc.DocumentNode.SelectSingleNode("//div[@class='identity__picture']").SelectSingleNode("img").Attributes["src"].Value;
-				PhotoUtils.CreateEscudos(escudo, pEquipo);
-			}
+			LoggerUtils.LogString(string.Format("[PARSER] Generated team {0} ({1})", equipoRes.NombreCorto, equipoRes.Puntero));
 
 			return equipoRes;
+		}
+
+		private static string PrepareUrl(string url)
+		{
+			if (url.Contains("/es/"))
+			{
+				return url.Replace("/es/", "").Replace("baloncesto", "basketball").Replace("equipo", "team");
+			}
+			if (url.Contains("/it/"))
+			{
+				return url.Replace("/it/", "").Replace("pallacanestro", "basketball").Replace("squadra", "team");
+			}
+			if (url.Contains("/fr/"))
+			{
+				return url.Replace("/fr/", "").Replace("equipe", "team");
+			}
+
+			return url;
 		}
 
 		private static Jugador GetJugadorFromUrl(string url, int puntero, bool generatePhotos)
@@ -213,7 +237,7 @@ namespace EpcbUtils
 			return pais == 0 ? Pais.LUXEMBURGO : (Pais)pais;
 		}
 
-		private static bool IsCotonou(Pais pais)
+		public static bool IsCotonou(Pais pais)
 		{
 			switch (pais)
 			{
@@ -273,7 +297,7 @@ namespace EpcbUtils
 			return false;
 		}
 
-		private static bool IsComunitario(Pais pais)
+		public static bool IsComunitario(Pais pais)
 		{
 			switch (pais)
 			{

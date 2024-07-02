@@ -90,11 +90,11 @@ namespace EpcbUtils
 		{
 			try
 			{
-				var medfoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MEDFOTO\\JUG{0:00000}.bmp", puntero)); 
-				var minifoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MINIFOTO\\JUG{0:00000}.bmp", puntero));				
+				var medfoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MEDFOTO\\JUG{0:00000}.bmp", puntero));
+				var minifoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MINIFOTO\\JUG{0:00000}.bmp", puntero));
 				var nanofoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\NANOFOTO\\JUG{0:00000}.bmp", puntero));
 
-				Remap(medfoto, 61, 89);
+				Remap(medfoto, 61, 89, 267);
 				Remap(minifoto, 28, 41);
 				Remap(nanofoto, 19, 27);
 			}
@@ -118,7 +118,18 @@ namespace EpcbUtils
 		{
 			try
 			{
-				var imageBytes = await _webClient.GetByteArrayAsync(url);
+				var bigUrl = url.Replace("width=1", "width=3");
+				byte[] imageBytes;
+
+				try
+				{
+					imageBytes = await _webClient.GetByteArrayAsync(bigUrl);
+				}
+				catch (Exception)
+				{
+					imageBytes = await _webClient.GetByteArrayAsync(url);
+				}
+				
 				var escudoFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\eq3d{0}.png", puntero));
 				File.WriteAllBytes(escudoFile, imageBytes);
 
@@ -183,7 +194,7 @@ namespace EpcbUtils
 
 			string input = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\eq3d{0}.png", puntero));
 			var output = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\EQBA{1:0000}.bmp", folder, puntero));
-			var nanoScript = string.Format("\"{0}\" ( +clone -background black -shadow 75x20+30+30 ) -background white +swap -layers merge +repage -resize 30x30 -extent 30x30 -type palette -compress none -remap \"{1}\" -write BMP3:\"{2}\"", input, palette, output);
+			var nanoScript = string.Format("\"{0}\" ( +clone -background black -shadow 75x20+30+30 ) -background white +swap -layers merge +repage -resize 33x33 -extent 30x30 -type palette -compress none -remap \"{1}\" -write BMP3:\"{2}\"", input, palette, output);
 			var nanoFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\nanoscript{0}.mgk", puntero));
 
 			File.WriteAllText(nanoFile, nanoScript);
@@ -200,7 +211,7 @@ namespace EpcbUtils
 
 			string input = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\eq3d{0}.png", puntero));
 			var output = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\EQBA{1:0000}.bmp", folder, puntero));
-			var nanoScript = string.Format("\"{0}\" ( +clone -background black -shadow 75x20+30+30 ) -background white +swap -layers merge +repage -resize 18x18 -extent 18x18 -type palette -compress none -remap \"{1}\" -write BMP3:\"{2}\"", input, palette, output);
+			var nanoScript = string.Format("\"{0}\" ( +clone -background black -shadow 75x20+30+30 ) -background white +swap -layers merge +repage -resize 20x20 -extent 18x18 -type palette -compress none -remap \"{1}\" -write BMP3:\"{2}\"", input, palette, output);
 			var nanoFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\nanoscript{0}.mgk", puntero));
 
 			File.WriteAllText(nanoFile, nanoScript);
@@ -262,7 +273,7 @@ namespace EpcbUtils
 						fileStream.Write(color, 0, 4);
 					}
 
-					fileStream.Position += offset;
+					fileStream.Position += offset; // fileStream.Length - width * height;
 
 					for (int i = 0; i < width * height; i++)
 					{

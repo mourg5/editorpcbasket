@@ -14,6 +14,8 @@ namespace EpcbUtils
 		private static Random _random = new Random(DateTime.Now.Millisecond);
 
 		public static short AnoInicio { get; set; }
+		public static bool UseCotNationality { get; set; }
+		public static bool UseEurNationality { get; set; }
 
 		public static Equipo ReadEquipoBytes(FileStream teamFile)
 		{
@@ -454,7 +456,7 @@ namespace EpcbUtils
 			playerFile.Write(ata, 0, ata.Length);
 
 			// Nacionalidad
-			playerFile.WriteByte((byte)jugador.Nacionalidad);
+			playerFile.WriteByte(GetNationalityByte(jugador.Nacionalidad));
 
 			// Color piel
 			byte color = jugador.ColorPiel ? (byte)1 : (byte)0;
@@ -503,6 +505,24 @@ namespace EpcbUtils
 			playerFile.WriteByte((byte)jugador.Medias.TiroL);
 			playerFile.WriteByte((byte)jugador.Medias.Rebotes);
 			playerFile.WriteByte((byte)jugador.Medias.Asistencias);
+		}
+
+		private static byte GetNationalityByte(Pais nacionalidad)
+		{
+			if (UseCotNationality)
+			{
+				return HtmlParserUtils.IsCotonou(nacionalidad)
+					? (byte)Pais.IRLANDA_DEL_NORTE
+					: (byte)nacionalidad;
+			}
+			if (UseEurNationality)
+			{
+				return HtmlParserUtils.IsComunitario(nacionalidad)
+					? (byte)Pais.LUXEMBURGO
+					: (byte)nacionalidad;
+			}
+
+			return (byte)nacionalidad;
 		}
 
 		private static List<string[]> _tacticas = new List<string[]>
@@ -564,6 +584,7 @@ namespace EpcbUtils
 				teamFile.Write(DinamicEncoding.GetBytes(equipo.NombreCorto), 0, equipo.NombreCorto.Length);
 
 				// Pabellón
+				if (string.IsNullOrEmpty(equipo.Pabellon)) equipo.Pabellon = string.Format("{0} Arena", equipo.NombreCorto);
 				teamFile.WriteByte((byte)equipo.Pabellon.Length);
 				teamFile.WriteByte(0);
 				teamFile.Write(DinamicEncoding.GetBytes(equipo.Pabellon), 0, equipo.Pabellon.Length);
@@ -572,6 +593,7 @@ namespace EpcbUtils
 				teamFile.WriteByte((byte)equipo.Pais);
 
 				// Aforo
+				if (equipo.Aforo < 1) equipo.Aforo = 1500;
 				var bytesCapacidad = BitConverter.GetBytes((short)equipo.Aforo);
 				teamFile.Write(bytesCapacidad, 0, bytesCapacidad.Length);
 
@@ -588,7 +610,7 @@ namespace EpcbUtils
 				AddDummyField(teamFile);
 
 				// Año fundación
-				var bytesFundacion = BitConverter.GetBytes((short)1997);
+				var bytesFundacion = BitConverter.GetBytes((short)1950);
 				teamFile.Write(bytesFundacion, 0, bytesFundacion.Length);
 
 				AddBytes(teamFile, 4);
@@ -597,6 +619,7 @@ namespace EpcbUtils
 				AddDummyField(teamFile);
 
 				// Presupuesto
+				if (equipo.Presupuesto < 1) equipo.Presupuesto = 350;
 				var bytesPresupuesto = BitConverter.GetBytes((short)equipo.Presupuesto);
 				teamFile.Write(bytesPresupuesto, 0, bytesPresupuesto.Length);
 
@@ -620,6 +643,7 @@ namespace EpcbUtils
 				teamFile.Write(relleno, 0, relleno.Length);
 
 				// Entrenador
+				if (string.IsNullOrEmpty(equipo.Entrenador)) equipo.Entrenador = "Naismith";
 				teamFile.Write(BitConverter.GetBytes((short)(equipo.Puntero * 2 - 1)), 0, 2);
 				teamFile.WriteByte((byte)equipo.Entrenador.Length);
 				teamFile.WriteByte(0);

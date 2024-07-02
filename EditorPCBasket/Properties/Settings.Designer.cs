@@ -12,7 +12,7 @@ namespace Editor_PCBasket___Mou.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.7.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.10.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -37,7 +37,7 @@ namespace Editor_PCBasket___Mou.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2024")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1998")]
         public int AnoInicio {
             get {
                 return ((int)(this["AnoInicio"]));
@@ -56,6 +56,42 @@ namespace Editor_PCBasket___Mou.Properties {
             }
             set {
                 this["SettingsCompleted"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UseCotNationality {
+            get {
+                return ((bool)(this["UseCotNationality"]));
+            }
+            set {
+                this["UseCotNationality"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UseEurNationality {
+            get {
+                return ((bool)(this["UseEurNationality"]));
+            }
+            set {
+                this["UseEurNationality"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AdjustBirthDates {
+            get {
+                return ((bool)(this["AdjustBirthDates"]));
+            }
+            set {
+                this["AdjustBirthDates"] = value;
             }
         }
     }

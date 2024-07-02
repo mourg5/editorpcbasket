@@ -3,6 +3,7 @@ using EpcbModel;
 using EpcbUtils;
 using System;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -136,14 +137,29 @@ namespace Editor_PCBasket___Mou.Views
 			SetEscudos();
 		}
 
+		private int _escudosRetries = 0;
+
 		private void SetEscudos()
 		{
-			if (Image3Desc == null) return;
+			try
+			{
+				if (Image3Desc == null) return;
 
-			Image3Desc.Source = DbdatUtils.Get3Desc(int.Parse(PunteroTextBox.Text));
-			ImageMiniesc.Source = DbdatUtils.GetMiniesc(int.Parse(PunteroTextBox.Text));
-			ImageNanoesc.Source = DbdatUtils.GetNanoesc(int.Parse(PunteroTextBox.Text));
-			ImageRidiesc.Source = DbdatUtils.GetRidiesc(int.Parse(PunteroTextBox.Text));
+				Image3Desc.Source = DbdatUtils.Get3Desc(int.Parse(PunteroTextBox.Text));
+				ImageMiniesc.Source = DbdatUtils.GetMiniesc(int.Parse(PunteroTextBox.Text));
+				ImageNanoesc.Source = DbdatUtils.GetNanoesc(int.Parse(PunteroTextBox.Text));
+				ImageRidiesc.Source = DbdatUtils.GetRidiesc(int.Parse(PunteroTextBox.Text));
+			}
+			catch (Exception ex)
+			{
+				LoggerUtils.LogException(ex);
+				_escudosRetries++;
+				if (_escudosRetries < 5)
+				{
+					Thread.Sleep(500);
+					SetEscudos();
+				}
+			}
 		}
 
 		private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)

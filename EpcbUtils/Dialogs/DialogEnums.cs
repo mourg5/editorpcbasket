@@ -6,11 +6,8 @@
 		{
 			SimpleDialog,
 			InputDialog,
-			AddFpr8aDialog,
-			AddInstrumentDialog,
+			ProballersImportDialog,
 			WaitingDialog,
-			SelectInstrumentDialog,
-			CreateGenericInstrumentDialog
 		}
 	}
 }

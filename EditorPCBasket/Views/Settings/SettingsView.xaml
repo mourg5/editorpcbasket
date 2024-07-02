@@ -193,9 +193,9 @@
                         </DataTemplate>
                     </GroupBox.HeaderTemplate>
                     <StackPanel>
-                        <CheckBox Content="Exportar países con ficha Europea como no extranjeros" Style="{StaticResource MaterialDesignFilterChipPrimaryCheckBox}" />
-                        <CheckBox Content="Exportar países con ficha Cotonou como no extranjeros" Style="{StaticResource MaterialDesignFilterChipPrimaryCheckBox}" />
-                        <CheckBox Content="Ajustar fechas de nacimiento a la temporada del MANAGER.EXE" Style="{StaticResource MaterialDesignFilterChipPrimaryCheckBox}" />
+                        <CheckBox Content="Exportar países con ficha Europea como no extranjeros" Style="{StaticResource MaterialDesignFilterChipPrimaryCheckBox}" IsChecked="{Binding UseEurNationality}" />
+                        <CheckBox Content="Exportar países con ficha Cotonou como no extranjeros" Style="{StaticResource MaterialDesignFilterChipPrimaryCheckBox}" IsChecked="{Binding UseCotNationality}"/>
+                        <CheckBox Content="Ajustar fechas de nacimiento a la temporada del MANAGER.EXE" Style="{StaticResource MaterialDesignFilterChipPrimaryCheckBox}" IsChecked="{Binding AdjustBirthDates}" />
                     </StackPanel>
                 </GroupBox>
             </StackPanel>

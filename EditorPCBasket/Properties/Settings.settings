@@ -6,9 +6,18 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="AnoInicio" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">2024</Value>
+      <Value Profile="(Default)">1998</Value>
     </Setting>
     <Setting Name="SettingsCompleted" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="UseCotNationality" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="UseEurNationality" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="AdjustBirthDates" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

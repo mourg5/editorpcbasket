@@ -12,6 +12,7 @@
         TextElement.FontWeight="Medium" TextElement.FontSize="14"
         Style="{StaticResource MaterialDesignWindow}"
         Loaded="Window_Loaded"
+        Topmost="True"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:converters="clr-namespace:Editor_PCBasket___Mou.Converters"
         Title="Editar Equipo" Height="820" Width="1400">
@@ -40,11 +41,11 @@
                 <TextBox Margin="5" Width="220" materialDesign:HintAssist.Hint="Nombre Corto" 
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
                          HorizontalAlignment="Left"
-                         Text="{Binding Equipo.NombreCorto}"/>
+                         Text="{Binding Equipo.NombreCorto, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBox Margin="5" materialDesign:HintAssist.Hint="Nombre Largo" 
                          HorizontalAlignment="Stretch"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
-                         Text="{Binding Equipo.NombreLargo}"/>
+                         Text="{Binding Equipo.NombreLargo, UpdateSourceTrigger=PropertyChanged}"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                     <ComboBox Margin="5"  materialDesign:HintAssist.Hint="País"      
                               Name="NacionalidadComboBox"

@@ -46,6 +46,18 @@ namespace EpcbUtils.Dialogs
 			return result.ToString();
 		}
 
+		public static void ShowProballersImportDialog()
+		{
+			OnShowDialog?.Invoke("", new DialogOptions()
+			{
+				Type = DialogEnums.DialogType.ProballersImportDialog, 
+				Title = "Importar equipo desde Proballers",
+				ButtonText = "Cancelar",
+				SecondButtonText = "Aceptar", 
+				Icon = PackIconKind.WebSync
+			});
+		}
+
 		//public static async Task<InstrumentSetting?> ShowAddInstrumentDialog(InstrumentType type)
 		//{
 		//	if (OnShowDialog == null) return null;

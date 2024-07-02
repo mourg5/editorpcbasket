@@ -41,6 +41,26 @@
   <PropertyGroup>
     <ApplicationIcon>icono.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CommonServiceLocator, Version=2.0.2.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.2.0.2\lib\net47\CommonServiceLocator.dll</HintPath>
@@ -146,6 +166,7 @@
     <Compile Include="Services\NavigationService.cs" />
     <Compile Include="ViewModels\Dialogs\BaseDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\InputDialogViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\ProballersImportViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\SimpleDialogViewModel.cs" />
     <Compile Include="ViewModels\Dialogs\WaitingDialogViewModel.cs" />
     <Compile Include="ViewModels\EquipoViewModel.cs" />
@@ -157,6 +178,9 @@
     <Compile Include="ViewModels\Teams\TeamsViewModel.cs" />
     <Compile Include="Views\Dialogs\InputDialog.xaml.cs">
       <DependentUpon>InputDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialogs\ProballersImportDialog.xaml.cs">
+      <DependentUpon>ProballersImportDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialogs\SimpleDialog.xaml.cs">
       <DependentUpon>SimpleDialog.xaml</DependentUpon>
@@ -202,6 +226,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialogs\InputDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialogs\ProballersImportDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -296,9 +324,6 @@
     <Resource Include="icono.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="mspaint.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Resource Include="Resources\logo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

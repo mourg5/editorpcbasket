@@ -46,8 +46,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 
 		private bool CanExecuteGenerateDbc()
 		{
-			//TODO: Implement condition
-			return true;
+			return !string.IsNullOrEmpty(Equipo.NombreCorto) && !string.IsNullOrEmpty(Equipo.NombreLargo);
 		}
 
 		public void ReloadMedias()
@@ -151,8 +150,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 
 		private bool CanExecuteSaveEquipo()
 		{
-			//TODO: Implement condition
-			return true;
+			return !string.IsNullOrEmpty(Equipo.NombreCorto) && !string.IsNullOrEmpty(Equipo.NombreLargo);
 		}
 	}
 }

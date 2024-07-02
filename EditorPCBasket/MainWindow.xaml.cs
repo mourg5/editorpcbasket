@@ -9,6 +9,7 @@ using MaterialDesignThemes.Wpf;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using System;
+using static System.Windows.Forms.Design.AxImporter;
 
 namespace Editor_PCBasket___Mou
 {
@@ -45,6 +46,9 @@ namespace Editor_PCBasket___Mou
 					case DialogEnums.DialogType.InputDialog:
 						dialog = new InputDialogViewModel(dialogOptions);
 						break;
+					case DialogEnums.DialogType.ProballersImportDialog:
+						dialog = new ProballersImportViewModel(dialogOptions);
+						break;
 					default:
 						dialog = "";
 						break;
@@ -65,6 +69,9 @@ namespace Editor_PCBasket___Mou
 				case DialogEnums.DialogType.WaitingDialog:
 					dialog = new WaitingDialogViewModel(options);
 					RootDialog.CloseOnClickAway = false;
+					break;
+				case DialogEnums.DialogType.ProballersImportDialog:
+					dialog = new ProballersImportViewModel(options);
 					break;
 				default:
 					dialog = new SimpleDialogViewModel(options);

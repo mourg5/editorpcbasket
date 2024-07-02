@@ -11,4 +11,7 @@
     <DataTemplate DataType="{x:Type vm:WaitingDialogViewModel}">
         <local:WaitingDialog/>
     </DataTemplate>
+    <DataTemplate DataType="{x:Type vm:ProballersImportViewModel}">
+        <local:ProballersImportDialog/>
+    </DataTemplate>
 </ResourceDictionary>

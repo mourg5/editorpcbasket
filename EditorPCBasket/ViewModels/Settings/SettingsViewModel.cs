@@ -24,6 +24,7 @@ namespace Editor_PCBasket___Mou.ViewModels.Settings
 			_databaseService = databaseService;
 
 			InitializeCommands();
+			InitializeSettings();
 			CheckPcbPath(PcbPath);
 			CheckDatabase();
 		}
@@ -113,6 +114,34 @@ namespace Editor_PCBasket___Mou.ViewModels.Settings
 			set { SetProperty(ref _iconsVisibility, value); }
 		}
 
+		private bool _useEurNationality;
+		public bool UseEurNationality
+		{
+			get { return _useEurNationality; }
+			set { SetProperty(ref _useEurNationality, value); }
+		}
+
+		private bool _useCotNationality;
+		public bool UseCotNationality
+		{
+			get { return _useCotNationality; }
+			set { SetProperty(ref _useCotNationality, value); }
+		}
+
+		private bool _adjustBirthDates;
+		public bool AdjustBirthDates
+		{
+			get { return _adjustBirthDates; }
+			set { SetProperty(ref _adjustBirthDates, value); }
+		}
+
+		private void InitializeSettings()
+		{
+			UseCotNationality = Properties.Settings.Default.UseCotNationality;
+			UseEurNationality = Properties.Settings.Default.UseEurNationality;
+			AdjustBirthDates = Properties.Settings.Default.AdjustBirthDates;
+		}
+
 		#endregion
 
 		#region Commands
@@ -189,10 +218,21 @@ namespace Editor_PCBasket___Mou.ViewModels.Settings
 
 		private void ExecuteAccept()
 		{
+			SaveSettings();
+			_navigationService.NavigateTo(NavigationView.MainMenuView, this);
+		}
+
+		private void SaveSettings()
+		{
 			Properties.Settings.Default.Path = PcbPath;
+			Properties.Settings.Default.UseCotNationality = UseCotNationality;
+			Properties.Settings.Default.UseEurNationality = UseEurNationality;
+			Properties.Settings.Default.AdjustBirthDates = AdjustBirthDates;
 			Properties.Settings.Default.SettingsCompleted = true;
 			Properties.Settings.Default.Save();
-			_navigationService.NavigateTo(NavigationView.MainMenuView, this);
+
+			HexUtils.UseCotNationality = UseCotNationality;
+			HexUtils.UseEurNationality = UseEurNationality;
 		}
 
 		private bool CanExecuteAccept()
