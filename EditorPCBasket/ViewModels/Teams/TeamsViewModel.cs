@@ -77,7 +77,9 @@ namespace Editor_PCBasket___Mou.ViewModels.Teams
 
 		private void ExecuteImportTeam()
 		{
-			
+			var team = HtmlParserUtils.GetEquipoFromHtml("https://www.proballers.com/basketball/team/13356/basquet-girona", 15, 211, true, true);
+			var teamWindow = new EquipoView(team);
+			teamWindow.Show();
 		}
 
 		private void ExecuteCreateTeam()

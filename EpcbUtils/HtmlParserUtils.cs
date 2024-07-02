@@ -12,7 +12,7 @@ namespace EpcbUtils
 		private static List<int> _dorsales = Enumerable.Range(0, 99).OrderBy(g => Guid.NewGuid()).ToList();
 		private static int _i = 0;
 
-		public static Equipo GetEquipoFromHtml(string url, int pEquipo, int pJugador, bool generatePhotos)
+		public static Equipo GetEquipoFromHtml(string url, int pEquipo, int pJugador, bool generatePhotos, bool generateEscudos = false)
 		{
 			var web = new HtmlWeb();
 			var doc = web.Load(url);
@@ -62,6 +62,12 @@ namespace EpcbUtils
 				}
 
 				if (equipoRes.Plantilla.Count > 12) break;
+			}
+
+			if (generateEscudos)
+			{
+				var escudo = doc.DocumentNode.SelectSingleNode("//div[@class='identity__picture']").SelectSingleNode("img").Attributes["src"].Value;
+				PhotoUtils.CreateEscudos(escudo, pEquipo);
 			}
 
 			return equipoRes;

@@ -260,6 +260,15 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Content Include="Graficos\bmp2palette.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graficos\dinamicpalette.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Graficos\palette.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Graficos\tmp\pcb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -287,18 +296,6 @@
     <Resource Include="icono.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Graficos\medfoto.bmp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Graficos\minifoto.bmp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Graficos\nanofoto.bmp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Graficos\palette.bmp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="mspaint.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

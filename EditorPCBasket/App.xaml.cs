@@ -20,7 +20,7 @@ namespace Editor_PCBasket___Mou
 	/// </summary>
 	public partial class App : PrismApplication
 	{
-		public int MaxLogFiles = 11;
+		public int MaxLogFiles = 20;
 
 		public App()
 		{
@@ -38,6 +38,7 @@ namespace Editor_PCBasket___Mou
 			SetFolders();
 
 			MagickNET.Initialize();
+			PhotoUtils.InitializeColorTables();
 
 			HexUtils.AnoInicio = (short)Settings.Default.AnoInicio;
 
@@ -63,13 +64,19 @@ namespace Editor_PCBasket___Mou
 			var medfotoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MEDFOTO"));
 			var minifotoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MINIFOTO"));
 			var nanofotoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\NANOFOTO"));
+			var _3descPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\3DESC"));
+			var miniescPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MINIESC"));
+			var nanoescPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\NANOESC"));
+			var ridiescPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\RIDIESC"));
 
-			if (!Directory.Exists(medfotoPath))
-			{
-				Directory.CreateDirectory(medfotoPath);
-				Directory.CreateDirectory(minifotoPath);
-				Directory.CreateDirectory(nanofotoPath);
-			}
+
+			Directory.CreateDirectory(medfotoPath);
+			Directory.CreateDirectory(minifotoPath);
+			Directory.CreateDirectory(nanofotoPath);
+			Directory.CreateDirectory(_3descPath);
+			Directory.CreateDirectory(miniescPath);
+			Directory.CreateDirectory(nanoescPath);
+			Directory.CreateDirectory(ridiescPath);
 		}
 
 		protected override void RegisterTypes(IContainerRegistry containerRegistry)
@@ -86,24 +93,33 @@ namespace Editor_PCBasket___Mou
 
 		private void Application_Exit(object sender, ExitEventArgs e)
 		{
-			LoggerUtils.CloseLogger();
-
-			var di = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "Logs");
-			var logFiles = di.GetFileSystemInfos();
-
-			var orderedFiles = logFiles.OrderByDescending(f => f.CreationTime);
-			for (int i = MaxLogFiles - 1; i <= orderedFiles.Count() - 1; i++)
+			try
 			{
-				var fileToDelete = orderedFiles.ElementAt(i);
-				File.Delete(fileToDelete.FullName);
+				var di = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "Logs");
+				var logFiles = di.GetFileSystemInfos();
+
+				var orderedFiles = logFiles.OrderByDescending(f => f.CreationTime);
+				for (int i = MaxLogFiles; i <= orderedFiles.Count() - 1; i++)
+				{
+					var fileToDelete = orderedFiles.ElementAt(i);
+					File.Delete(fileToDelete.FullName);
+				}
+
+				var temp = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "Graficos\\tmp");
+				foreach (var tmpFile in temp.GetFileSystemInfos())
+				{
+					if (tmpFile.Name.EndsWith("pcb")) continue;
+					tmpFile.Delete();
+				}
+
+				LoggerUtils.CloseLogger();
 			}
-
-			var temp = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "Graficos\\tmp");
-			foreach (var tmpFile in temp.GetFileSystemInfos())
+			catch (Exception ex)
 			{
-				if (tmpFile.Name.EndsWith("pcb")) continue;
-				tmpFile.Delete();
+				LoggerUtils.LogException(ex);
+				LoggerUtils.CloseLogger();
 			}
 		}
 	}
 }
+

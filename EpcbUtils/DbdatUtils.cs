@@ -75,7 +75,11 @@ namespace EpcbUtils
 			BitmapImage escudo;
 			try
 			{
-				var uri = new Uri(string.Format("{0}\\DBDAT\\3DESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
+				var uri = new Uri(string.Format("{0}\\Graficos\\3DESC\\EQBA{1}.bmp", AppDomain.CurrentDomain.BaseDirectory, puntero.ToString("0000")));
+				if (!File.Exists(uri.AbsolutePath))
+				{
+					uri = new Uri(string.Format("{0}\\DBDAT\\3DESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
+				}
 				escudo = new BitmapImage(uri);
 			}
 			catch (Exception)
@@ -91,7 +95,11 @@ namespace EpcbUtils
 			BitmapImage escudo;
 			try
 			{
-				var uri = new Uri(string.Format("{0}\\DBDAT\\MINIESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
+				var uri = new Uri(string.Format("{0}\\Graficos\\MINIESC\\EQBA{1}.bmp", AppDomain.CurrentDomain.BaseDirectory, puntero.ToString("0000")));
+				if (!File.Exists(uri.AbsolutePath))
+				{
+					uri = new Uri(string.Format("{0}\\DBDAT\\MINIESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
+				}
 				escudo = new BitmapImage(uri);
 			}
 			catch (Exception)
@@ -107,7 +115,11 @@ namespace EpcbUtils
 			BitmapImage escudo;
 			try
 			{
-				var uri = new Uri(string.Format("{0}\\DBDAT\\NANOESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
+				var uri = new Uri(string.Format("{0}\\Graficos\\NANOESC\\EQBA{1}.bmp", AppDomain.CurrentDomain.BaseDirectory, puntero.ToString("0000")));
+				if (!File.Exists(uri.AbsolutePath))
+				{
+					uri = new Uri(string.Format("{0}\\DBDAT\\NANOESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
+				}
 				escudo = new BitmapImage(uri);
 			}
 			catch (Exception)
@@ -123,7 +135,11 @@ namespace EpcbUtils
 			BitmapImage escudo;
 			try
 			{
-				var uri = new Uri(string.Format("{0}\\DBDAT\\RIDIESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
+				var uri = new Uri(string.Format("{0}\\Graficos\\RIDIESC\\EQBA{1}.bmp", AppDomain.CurrentDomain.BaseDirectory, puntero.ToString("0000")));
+				if (!File.Exists(uri.AbsolutePath))
+				{
+					uri = new Uri(string.Format("{0}\\DBDAT\\RIDIESC\\EQBA{1}.bmp", PcbPathForBitmaps, puntero.ToString("0000")));
+				}
 				escudo = new BitmapImage(uri);
 			}
 			catch (Exception)

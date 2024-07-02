@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight.Messaging;
 using System;
 using System.IO;
+using System.Windows.Threading;
 
 namespace EpcbUtils
 {
@@ -13,18 +14,31 @@ namespace EpcbUtils
 
 		public static void LogException(Exception ex)
 		{
-			_logger = File.AppendText(LogFilePath);
-			_logger.WriteLine("[" + DateTime.Now.ToString() + "] " + ex.ToString());
-			_logger.Close();
+			try
+			{
+				Dispatcher.CurrentDispatcher.Invoke(new Action(() =>
+				{
+					_logger = File.AppendText(LogFilePath);
+					_logger.WriteLine("[" + DateTime.Now.ToString() + "] " + ex.ToString());
+					_logger.Close();
+				}));
+			}
+			catch (Exception)
+			{
+
+			}
 		}
 
 		public static void LogString(string str)
 		{
-			_logger = File.AppendText(LogFilePath);
-			_logger.WriteLine("[" + DateTime.Now.ToString() + "] " + str);
-			_logger.Close();
+			Dispatcher.CurrentDispatcher.Invoke(new Action(() =>
+			{
+				_logger = File.AppendText(LogFilePath);
+				_logger.WriteLine("[" + DateTime.Now.ToString() + "] " + str);
+				_logger.Close();
 
-			Messenger.Default.Send(new StatusMessage() { Message = str });
+				Messenger.Default.Send(new StatusMessage() { Message = str });
+			}));
 		}
 
 		public static void CloseLogger()

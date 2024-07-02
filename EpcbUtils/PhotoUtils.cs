@@ -1,13 +1,10 @@
 ﻿using EpcbModel;
 using System;
 using System.Diagnostics;
-using System.Drawing.Drawing2D;
-using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
-using System.Windows.Forms;
 using System.Net.Http;
+using System.Collections.Generic;
 
 namespace EpcbUtils
 {
@@ -20,19 +17,33 @@ namespace EpcbUtils
 
 	public static class PhotoUtils
 	{
-		private static HttpClient _webClient = new HttpClient();
+		#region Fotos
 
-		public static async void CreatePhotos(string url, Jugador jugador)
+		public static void CreatePhotos(string url, Jugador jugador)
 		{
-			if (url.ToLower().Contains("defaut")) return;
+			var thread = new Thread(() => CreatePhotosThread(url, jugador));
+			thread.Start();
+		}
 
-			var imageBytes = await _webClient.GetByteArrayAsync(url);
-			var playerFoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\{0}.jpg", jugador.Puntero));
-			File.WriteAllBytes(playerFoto, imageBytes);			
+		private static async void CreatePhotosThread(string url, Jugador jugador)
+		{
+			try
+			{
+				if (url.ToLower().Contains("defaut")) return;
 
-			CreateFotoImageMagick(jugador.Puntero, PhotoSize.MEDFOTO);
-			CreateFotoImageMagick(jugador.Puntero, PhotoSize.MINIFOTO);
-			CreateFotoImageMagick(jugador.Puntero, PhotoSize.NANOFOTO);
+				var imageBytes = await _webClient.GetByteArrayAsync(url);
+				var playerFoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\{0}.jpg", jugador.Puntero));
+				File.WriteAllBytes(playerFoto, imageBytes);
+
+				CreateFotoImageMagick(jugador.Puntero, PhotoSize.MEDFOTO);
+				CreateFotoImageMagick(jugador.Puntero, PhotoSize.MINIFOTO);
+				CreateFotoImageMagick(jugador.Puntero, PhotoSize.NANOFOTO);
+				RemapFotos(jugador.Puntero);
+			}
+			catch (Exception ex)
+			{
+				LoggerUtils.LogException(ex);
+			}
 		}
 
 		private static void CreateFotoImageMagick(int puntero, PhotoSize format)
@@ -69,114 +80,299 @@ namespace EpcbUtils
 			var output = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\JUG{1:00000}.bmp", folder, puntero));
 			var palette = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Graficos\\palette.bmp");
 
-			var script = string.Format("/c magick {0} -resize {1} -crop {2} -type palette -compress none -remap {3} {4}", input, size, crop, palette, output);
+			var script = string.Format("/c magick {0} -resize {1} -crop {2} -type palette -compress none -remap {3} BMP3:{4}", input, size, crop, palette, output);
 
 
+			ExecuteCmd(script);
+		}
+
+		private static void RemapFotos(int puntero)
+		{
+			try
+			{
+				var medfoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MEDFOTO\\JUG{0:00000}.bmp", puntero)); 
+				var minifoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MINIFOTO\\JUG{0:00000}.bmp", puntero));				
+				var nanofoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\NANOFOTO\\JUG{0:00000}.bmp", puntero));
+
+				Remap(medfoto, 61, 89);
+				Remap(minifoto, 28, 41);
+				Remap(nanofoto, 19, 27);
+			}
+			catch (Exception ex)
+			{
+				LoggerUtils.LogException(ex);
+			}
+		}
+
+		#endregion
+
+		#region Escudos
+
+		public static void CreateEscudos(string url, int puntero)
+		{
+			var thread = new Thread(() => CreateEscudosThread(url, puntero));
+			thread.Start();
+		}
+
+		private static async void CreateEscudosThread(string url, int puntero)
+		{
+			try
+			{
+				var imageBytes = await _webClient.GetByteArrayAsync(url);
+				var escudoFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\eq3d{0}.png", puntero));
+				File.WriteAllBytes(escudoFile, imageBytes);
+
+				Create3DEsc(puntero);
+				CreateMiniesc(puntero);
+				CreateNanoesc(puntero);
+				CreateRidiesc(puntero);
+				RemapEscudos(puntero);
+			}
+			catch (Exception ex)
+			{
+				LoggerUtils.LogException(ex);
+			}
+		}
+
+		private static void Create3DEsc(int puntero)
+		{
+			string folder = "3DESC";
+			var palette = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Graficos\\palette.bmp");
+
+			string input = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\eq3d{0}.png", puntero));
+			var output = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\EQBA{1:0000}.bmp", folder, puntero));
+			var script = string.Format("/c magick {0} -background black -alpha remove -alpha off -resize 84x84 -gravity center -extent 120x120 -type palette -compress none -remap {1} BMP3:{2}", input, palette, output);
+
+			var inputAlpha = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\eq3d{0}_alpha.png", puntero));
+			var outputAlpha = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\EQBA{1:0000}_ALPHA.bmp", folder, puntero));
+			var scriptExtractAlpha = string.Format("/c magick {0} -alpha extract {1}", input, inputAlpha);
+			var scriptAlpha = string.Format("/c magick {0} -resize 84x84 -gravity center -background black -extent 120x120 -type palette -compress none -remap {1} BMP3:{2}", inputAlpha, palette, outputAlpha);
+
+			ExecuteCmd(script);
+			ExecuteCmd(scriptExtractAlpha);
+			ExecuteCmd(scriptAlpha);
+		}
+
+		private static void CreateMiniesc(int puntero)
+		{
+			string folder = "MINIESC";
+			var palette = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Graficos\\palette.bmp");
+
+			string input = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\eq3d{0}.png", puntero));
+			var output = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\EQBA{1:0000}.bmp", folder, puntero));
+			var tmpScript = string.Format("/c magick {0} -gravity center -background black -alpha remove -alpha off -resize 48x48 -extent 48x63 -type palette -compress none -remap {1} BMP3:{2}", input, palette, output);
+			var script = string.Format("/c magick {0} -background black -extent 54x70 -type palette -compress none -remap {1} BMP3:{2}", output, palette, output);
+
+			var inputAlpha = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\eq3d{0}_alpha.png", puntero));
+			var outputAlpha = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\EQBA{1:0000}_ALPHA.bmp", folder, puntero));
+			var scriptExtractAlpha = string.Format("/c magick {0} -alpha extract {1}", input, inputAlpha);
+			var tmpScriptAlpha = string.Format("/c magick {0} -gravity center -background black -resize 48x48 -extent 48x63 -type palette -compress none -remap {1} BMP3:{2}", inputAlpha, palette, outputAlpha);
+			var scriptAlpha = string.Format("/c magick {0} -background black -extent 54x70 -type palette -compress none -remap {1} BMP3:{2}", outputAlpha, palette, outputAlpha);
+
+			ExecuteCmd(tmpScript);
+			ExecuteCmd(script);
+			ExecuteCmd(scriptExtractAlpha);
+			ExecuteCmd(tmpScriptAlpha);
+			ExecuteCmd(scriptAlpha);
+		}
+
+		private static void CreateNanoesc(int puntero)
+		{
+			string folder = "NANOESC";
+			var palette = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Graficos\\palette.bmp");
+
+			string input = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\eq3d{0}.png", puntero));
+			var output = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\EQBA{1:0000}.bmp", folder, puntero));
+			var nanoScript = string.Format("\"{0}\" ( +clone -background black -shadow 75x20+30+30 ) -background white +swap -layers merge +repage -resize 30x30 -extent 30x30 -type palette -compress none -remap \"{1}\" -write BMP3:\"{2}\"", input, palette, output);
+			var nanoFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\nanoscript{0}.mgk", puntero));
+
+			File.WriteAllText(nanoFile, nanoScript);
+
+			var script = string.Format("/c magick -script {0}", nanoFile);
+
+			ExecuteCmd(script);
+		}
+
+		private static void CreateRidiesc(int puntero)
+		{
+			string folder = "RIDIESC";
+			var palette = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Graficos\\palette.bmp");
+
+			string input = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\eq3d{0}.png", puntero));
+			var output = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\EQBA{1:0000}.bmp", folder, puntero));
+			var nanoScript = string.Format("\"{0}\" ( +clone -background black -shadow 75x20+30+30 ) -background white +swap -layers merge +repage -resize 18x18 -extent 18x18 -type palette -compress none -remap \"{1}\" -write BMP3:\"{2}\"", input, palette, output);
+			var nanoFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\nanoscript{0}.mgk", puntero));
+
+			File.WriteAllText(nanoFile, nanoScript);
+
+			var script = string.Format("/c magick -script {0}", nanoFile);
+
+			ExecuteCmd(script);
+		}
+
+		private static void RemapEscudos(int puntero)
+		{
+			try
+			{
+				var _3desc = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\3DESC\\EQBA{0:0000}.bmp", puntero));
+				var miniesc = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MINIESC\\EQBA{0:0000}.bmp", puntero));
+				var nanoesc = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\NANOESC\\EQBA{0:0000}.bmp", puntero));
+				var ridiesc = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\RIDIESC\\EQBA{0:0000}.bmp", puntero));
+
+				Remap(_3desc, 120, 120);
+				Remap(miniesc, 54, 70);
+				Remap(nanoesc, 30, 30, 60);
+				Remap(ridiesc, 18, 18, 36);
+			}
+			catch (Exception ex)
+			{
+				LoggerUtils.LogException(ex);
+			}
+		}
+
+		#endregion
+
+		#region Bmp
+
+		private static List<byte[]> _dinamicPalette;
+		private static List<byte[]> _bmp2Palette;
+		private static List<string> _bmp2ColorTable;
+		private static List<string> _dinamicColorTable;
+
+		public static void InitializeColorTables()
+		{
+			var bmpPalette = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Graficos\\bmp2palette.bmp");
+			var dinamicPalette = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Graficos\\dinamicpalette.bmp");
+
+			_bmp2ColorTable = ReadColorTable(bmpPalette);
+			_bmp2Palette = ReadPalette(bmpPalette);
+			_dinamicColorTable = ReadColorTable(dinamicPalette);
+			_dinamicPalette = ReadPalette(dinamicPalette);
+		}
+
+		public static void Remap(string filePath, int width, int height, int offset = 0)
+		{
+			try
+			{
+				using (var fileStream = File.Open(filePath, FileMode.Open))
+				{
+					fileStream.Position = 0x36;
+					foreach (var color in _dinamicPalette)
+					{
+						fileStream.Write(color, 0, 4);
+					}
+
+					fileStream.Position += offset;
+
+					for (int i = 0; i < width * height; i++)
+					{
+						var color = fileStream.ReadByte();
+						var newColor = ReplaceColor(color);
+						fileStream.Position--;
+						fileStream.WriteByte(newColor);
+					}
+
+					fileStream.Close();
+
+					LoggerUtils.LogString(string.Format("[GRAPHICS] Remapped file {0} to Dinamic palette", filePath));
+				}
+			}
+			catch (Exception ex)
+			{
+				LoggerUtils.LogException(ex);
+			}
+		}
+
+		private static List<string> ReadColorTable(string path)
+		{
+			List<string> colorTable = new List<string>();
+
+			using (var fileStream = File.OpenRead(path))
+			{
+				fileStream.Position = 0x36;
+				for (int i = 0; i < 256; i++)
+				{
+					byte[] color = new byte[4];
+					fileStream.Read(color, 0, 4);
+					colorTable.Add(string.Format("{0}{1}{2}{3}", color[0], color[1], color[2], color[3]));
+				}
+			}
+
+			return colorTable;
+		}
+
+		private static List<byte[]> ReadPalette(string dinamicPalette)
+		{
+			var palette = new List<byte[]>();
+			using (var fileStream = File.OpenRead(dinamicPalette))
+			{
+				fileStream.Position = 0x36;
+				for (int i = 0; i < 256; i++)
+				{
+					var bytes = new byte[4];
+					fileStream.Read(bytes, 0, 4);
+					palette.Add(bytes);
+				}
+			}
+
+			return palette;
+		}
+
+		private static byte ReplaceColor(int color)
+		{
+			var originalColor = _bmp2ColorTable[color];
+			var newColor = _dinamicColorTable.IndexOf(originalColor);
+
+			if (newColor < 0)
+			{
+				return FindNearestColor(color);
+			}
+
+			return (byte)newColor;
+		}
+
+		private static byte FindNearestColor(int color)
+		{
+			var originalColor = _bmp2Palette[color];
+
+			var minDifference = int.MaxValue;
+			var minIndex = 0;
+
+			for (int i = 0; i < 256; i++)
+			{
+				var diff = Math.Abs(originalColor[0] - _dinamicPalette[i][0])
+					+ Math.Abs(originalColor[1] - _dinamicPalette[i][1])
+					+ Math.Abs(originalColor[2] - _dinamicPalette[i][2])
+					+ Math.Abs(originalColor[3] - _dinamicPalette[i][3]);
+
+				if (diff < minDifference)
+				{
+					minDifference = diff;
+					minIndex = i;
+				}
+			}
+
+			return (byte)minIndex;
+		}
+
+		#endregion
+
+		#region Aux
+
+		private static HttpClient _webClient = new HttpClient();
+
+		private static void ExecuteCmd(string command)
+		{
 			Process process = new Process();
 			ProcessStartInfo startInfo = new ProcessStartInfo
 			{
 				WindowStyle = ProcessWindowStyle.Hidden,
 				FileName = "cmd.exe",
-				Arguments = script
+				Arguments = string.Format("{0}", command),
 			};
 			process.StartInfo = startInfo;
 			process.Start();
-		}
-
-		private static void CreateFotoMspaint(Jugador jugador, Image webFoto, PhotoSize format)
-		{
-			Rectangle crop;
-			Size size;
-			string fotoName;
-			string folderName;
-			int waitTime = 50;
-
-			switch (format)
-			{
-				case PhotoSize.MEDFOTO:
-					size = new Size(89, 89);
-					crop = new Rectangle(14, 0, 60, 88);
-					fotoName = "medfoto.bmp";
-					folderName = "MEDFOTO";
-					waitTime = 150;
-					break;
-				case PhotoSize.MINIFOTO:
-					size = new Size(41, 41);
-					crop = new Rectangle(6, 0, 27, 40);
-					fotoName = "minifoto.bmp";
-					folderName = "MINIFOTO";
-					break;
-				case PhotoSize.NANOFOTO:
-					size = new Size(27, 27);
-					crop = new Rectangle(4, 0, 18, 26);
-					fotoName = "nanofoto.bmp";
-					folderName = "NANOFOTO";
-					break;
-				default:
-					size = new Size(89, 89);
-					crop = new Rectangle(14, 0, 60, 88);
-					fotoName = "medfoto.bmp";
-					folderName = "MEDFOTO";
-					break;
-			}
-
-			var image = ResizeImage(webFoto, size);
-			var origBmp = new Bitmap(image);
-
-			var cropBmp = origBmp.Clone(crop, origBmp.PixelFormat);
-			CopyBitmapToClipboard(cropBmp);
-
-			var paintPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "mspaint.exe");
-			var template = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}", fotoName));
-			var playerFoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\JUG{1:00000}.bmp", folderName, jugador.Puntero));
-			File.Copy(template, playerFoto, true);
-			var paint = Process.Start(new ProcessStartInfo(paintPath, playerFoto));
-
-			paint.WaitForInputIdle();
-			IntPtr h = paint.MainWindowHandle;
-			SetForegroundWindow(h);
-			Thread.Sleep(100);
-			SendKeys.SendWait("^v");
-			SendKeys.SendWait("%{f4}");
-			Thread.Sleep(waitTime);
-			SendKeys.SendWait("s");
-			paint.Close();
-			Thread.Sleep(waitTime);
-		}
-
-		[DllImport("User32.dll")]
-		static extern int SetForegroundWindow(IntPtr point);
-
-		private static void CopyBitmapToClipboard(Bitmap bmp)
-		{
-			Clipboard.SetImage(bmp);
-		}
-
-		private static Image ResizeImage(Image imgToResize, Size size)
-		{
-			int sourceWidth = imgToResize.Width;
-			int sourceHeight = imgToResize.Height;
-
-			float nPercent;
-			float nPercentW = size.Width / (float)sourceWidth;
-			float nPercentH = size.Height / (float)sourceHeight;
-
-			if (nPercentH < nPercentW)
-				nPercent = nPercentH;
-			else
-				nPercent = nPercentW;
-
-			int destWidth = (int)(sourceWidth * nPercent);
-			int destHeight = (int)(sourceHeight * nPercent);
-
-			Bitmap b = new Bitmap(destWidth, destHeight);
-			Graphics g = Graphics.FromImage((Image)b);
-			g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-
-			g.DrawImage(imgToResize, 0, 0, destWidth, destHeight);
-			g.Dispose();
-
-			return (Image)b;
+			process.WaitForExit();
 		}
 
 		public static void CopyPhotos(Equipo equipo)
@@ -194,10 +390,38 @@ namespace EpcbUtils
 					File.Copy(nanofoto, Path.Combine(DbdatUtils.PcbPathForBitmaps, string.Format("DBDAT\\NANOFOTO\\JUG{0:00000}.bmp", jugador.Puntero)), true);
 				}
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-				// ignored
+				LoggerUtils.LogException(ex);
 			}
 		}
+
+		public static void CopyEscudos(int puntero)
+		{
+			try
+			{
+				var _3desc = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\3DESC\\EQBA{0:0000}.bmp", puntero));
+				var _3descAlpha = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\3DESC\\EQBA{0:0000}_ALPHA.bmp", puntero));
+				var miniesc = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MINIESC\\EQBA{0:0000}.bmp", puntero));
+				var miniescAlpha = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MINIESC\\EQBA{0:0000}_ALPHA.bmp", puntero));
+				var nanoesc = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\NANOESC\\EQBA{0:0000}.bmp", puntero));
+				var ridiesc = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\RIDIESC\\EQBA{0:0000}.bmp", puntero));
+
+				File.Copy(_3desc, Path.Combine(DbdatUtils.PcbPathForBitmaps, string.Format("DBDAT\\3DESC\\EQBA{0:0000}.bmp", puntero)), true);
+				File.Copy(_3descAlpha, Path.Combine(DbdatUtils.PcbPathForBitmaps, string.Format("DBDAT\\3DESC\\EQBA{0:0000}_ALPHA.bmp", puntero)), true);
+				File.Copy(miniesc, Path.Combine(DbdatUtils.PcbPathForBitmaps, string.Format("DBDAT\\MINIESC\\EQBA{0:0000}.bmp", puntero)), true);
+				File.Copy(miniescAlpha, Path.Combine(DbdatUtils.PcbPathForBitmaps, string.Format("DBDAT\\MINIESC\\EQBA{0:0000}_ALPHA.bmp", puntero)), true);
+				File.Copy(nanoesc, Path.Combine(DbdatUtils.PcbPathForBitmaps, string.Format("DBDAT\\NANOESC\\EQBA{0:0000}.bmp", puntero)), true);
+				File.Copy(nanoesc, Path.Combine(DbdatUtils.PcbPathForBitmaps, string.Format("DBDAT\\RIDIESC\\EQBA{0:0000}.bmp", puntero)), true);
+
+			}
+			catch (Exception ex)
+			{
+				LoggerUtils.LogException(ex);
+			}
+		}
+
+		#endregion
 	}
 }
+
