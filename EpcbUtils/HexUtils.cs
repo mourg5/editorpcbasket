@@ -1,5 +1,4 @@
 ﻿using EpcbModel;
-using KGySoft.CoreLibraries;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -553,7 +552,7 @@ namespace EpcbUtils
 
 			do
 			{
-				tactica = _tacticas[posicion].ElementAt(_random.NextInt16((short)(_tacticas[posicion].Length - 1)));
+				tactica = _tacticas[posicion].ElementAt(_random.Next((short)(_tacticas[posicion].Length - 1)));
 			} while (tactica.Length != 8);
 
 			return DinamicEncoding.GetBytes(tactica);

@@ -301,21 +301,37 @@ namespace EpcbUtils
 		{
 			switch (pais)
 			{
+				case (Pais.ALBANIA):
+				case (Pais.ANDORRA):
+				case (Pais.ARMENIA):
+				case (Pais.AZERBAYAN):
+				case (Pais.BIELORUSIA):
+				case (Pais.BOSNIA):
 				case (Pais.BULGARIA):
 				case (Pais.CHIPRE):
 				case (Pais.CROACIA):
+				case (Pais.DINAMARCA):
 				case (Pais.ESLOVAQUIA):
 				case (Pais.ESLOVENIA):
 				case (Pais.ESTONIA):
+				case (Pais.GEORGIA):
 				case (Pais.HUNGRIA):
+				case (Pais.ISLANDIA):
 				case (Pais.ISRAEL):
-				case (Pais.KAZAKISTAN):
 				case (Pais.LETONIA):
 				case (Pais.LITUANIA):
+				case (Pais.MACEDONIA):
+				case (Pais.MALTA):
+				case (Pais.MOLDAVIA):
+				case (Pais.MONACO):
 				case (Pais.POLONIA):
 				case (Pais.REP_CHECA):
 				case (Pais.RUMANIA):
 				case (Pais.RUSIA):
+				case (Pais.SUIZA):
+				case (Pais.UCRANIA):
+				case (Pais.YUGOSLAVIA):
+				case (Pais.SERBIA):
 					return true;
 			}
 			return false;

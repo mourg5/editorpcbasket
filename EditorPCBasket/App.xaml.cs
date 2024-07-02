@@ -2,7 +2,6 @@
 using Editor_PCBasket___Mou.Properties;
 using Editor_PCBasket___Mou.Services;
 using EpcbUtils;
-using ImageMagick;
 using Prism.Ioc;
 using Prism.Unity;
 using System;
@@ -37,7 +36,6 @@ namespace Editor_PCBasket___Mou
 
 			SetFolders();
 
-			MagickNET.Initialize();
 			PhotoUtils.InitializeColorTables();
 
 			HexUtils.AnoInicio = (short)Settings.Default.AnoInicio;
