@@ -83,11 +83,13 @@
   <ItemGroup>
     <Compile Include="DbContextLocator.cs" />
     <Compile Include="Equipo.cs" />
+    <Compile Include="IAbilities.cs" />
     <Compile Include="Jugador.cs" />
     <Compile Include="Medias.cs" />
     <Compile Include="Pais.cs" />
     <Compile Include="PcBasketContext.cs" />
     <Compile Include="PcBasketDbLocator.cs" />
+    <Compile Include="PlayerStatistics.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

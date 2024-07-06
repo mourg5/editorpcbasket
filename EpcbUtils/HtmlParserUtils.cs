@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using EpcbModel;
 using HtmlAgilityPack;
@@ -12,7 +13,7 @@ namespace EpcbUtils
 		private static List<int> _dorsales = Enumerable.Range(0, 99).OrderBy(g => Guid.NewGuid()).ToList();
 		private static int _i = 0;
 
-		public static Equipo GetEquipoFromHtml(string url, int pEquipo, int pJugador, bool generatePhotos, bool generateEscudos = false)
+		public static Equipo GetEquipoFromHtml(string url, int pEquipo, int pJugador, bool generatePhotos, bool generateEscudos, int desiredRating = -1)
 		{
 			url = PrepareUrl(url);
 
@@ -47,6 +48,9 @@ namespace EpcbUtils
 			var plantilla = eqInfo.SelectSingleNode("//table[@class='table']").SelectSingleNode("//tbody");
 
 			var punteroJug = pJugador;
+
+			var teamStatistics = new Dictionary<int, PlayerStatistics>();
+
 			foreach (var jugador in plantilla.SelectNodes("//tr"))
 			{
 				var jugNode = jugador.Descendants().ElementAt(3);
@@ -58,6 +62,40 @@ namespace EpcbUtils
 				nombre = nombre.Replace("  ", "");
 
 				var urlJug = jugNode.ParentNode.ChildNodes[1].Attributes[1].Value;
+
+				PlayerStatistics playerStatistics;
+
+				if (desiredRating > 0)
+				{
+					try
+					{
+						playerStatistics = new PlayerStatistics()
+						{
+							Points = double.Parse(jugador.Descendants("td").ElementAt(3).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
+							Rebounds = double.Parse(jugador.Descendants("td").ElementAt(4).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
+							Assists = double.Parse(jugador.Descendants("td").ElementAt(5).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
+							Minutes = double.Parse(jugador.Descendants("td").ElementAt(8).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
+							Pct3Pointers = double.Parse(jugador.Descendants("td").ElementAt(9).InnerText.Replace("%", "").Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")) / 100,
+							PctFieldGoalds = double.Parse(jugador.Descendants("td").ElementAt(10).InnerText.Replace("%", "").Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "35")) / 100,
+							PctFreeThrows = double.Parse(jugador.Descendants("td").ElementAt(11).InnerText.Replace("%", "").Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "60")) / 100,
+							OffensiveRebounds = double.Parse(jugador.Descendants("td").ElementAt(12).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
+							Steals = double.Parse(jugador.Descendants("td").ElementAt(15).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
+							TurnOvers = double.Parse(jugador.Descendants("td").ElementAt(16).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
+							Blocks = double.Parse(jugador.Descendants("td").ElementAt(17).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
+							Fouls = double.Parse(jugador.Descendants("td").ElementAt(18).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
+							Efficiency = double.Parse(jugador.Descendants("td").ElementAt(20).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
+							HighestPoints = double.Parse(jugador.Descendants("td").ElementAt(21).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
+							HighestRebounds = double.Parse(jugador.Descendants("td").ElementAt(22).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
+							HighestAssists = double.Parse(jugador.Descendants("td").ElementAt(23).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
+						};
+
+						teamStatistics.Add(punteroJug, playerStatistics);
+					}
+					catch (Exception ex)
+					{
+						LoggerUtils.LogException(ex);
+					}
+				}
 
 				try
 				{
@@ -74,6 +112,11 @@ namespace EpcbUtils
 				if (equipoRes.Plantilla.Count > 12) break;
 			}
 
+			if (desiredRating > 0)
+			{
+				RatingsUtils.GenerateTeamRatings(equipoRes.Plantilla, teamStatistics, desiredRating);
+			}
+
 			LoggerUtils.LogString(string.Format("[PARSER] Generated team {0} ({1})", equipoRes.NombreCorto, equipoRes.Puntero));
 
 			return equipoRes;
@@ -83,15 +126,15 @@ namespace EpcbUtils
 		{
 			if (url.Contains("/es/"))
 			{
-				return url.Replace("/es/", "").Replace("baloncesto", "basketball").Replace("equipo", "team");
+				return url.Replace("/es/", "/").Replace("baloncesto", "basketball").Replace("equipo", "team");
 			}
 			if (url.Contains("/it/"))
 			{
-				return url.Replace("/it/", "").Replace("pallacanestro", "basketball").Replace("squadra", "team");
+				return url.Replace("/it/", "/").Replace("pallacanestro", "basketball").Replace("squadra", "team");
 			}
 			if (url.Contains("/fr/"))
 			{
-				return url.Replace("/fr/", "").Replace("equipe", "team");
+				return url.Replace("/fr/", "/").Replace("equipe", "team");
 			}
 
 			return url;
@@ -329,6 +372,8 @@ namespace EpcbUtils
 				case (Pais.RUMANIA):
 				case (Pais.RUSIA):
 				case (Pais.SUIZA):
+				case (Pais.SAN_MARINO):
+				case (Pais.TURQUIA):
 				case (Pais.UCRANIA):
 				case (Pais.YUGOSLAVIA):
 				case (Pais.SERBIA):

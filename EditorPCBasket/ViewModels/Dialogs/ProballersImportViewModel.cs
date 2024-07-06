@@ -44,7 +44,9 @@ namespace Editor_PCBasket___Mou.ViewModels.Dialogs
 		{
 			try
 			{
-				var team = HtmlParserUtils.GetEquipoFromHtml(Url, TeamPointer, PlayerPointer, GeneratePhotos, GenerateBadges);
+				var team = GenerateRatings
+					? HtmlParserUtils.GetEquipoFromHtml(Url, TeamPointer, PlayerPointer, GeneratePhotos, GenerateBadges, DesiredRating)
+					: HtmlParserUtils.GetEquipoFromHtml(Url, TeamPointer, PlayerPointer, GeneratePhotos, GenerateBadges);
 
 				Application.Current.Dispatcher.Invoke(new Action(() =>
 				{
@@ -123,6 +125,20 @@ namespace Editor_PCBasket___Mou.ViewModels.Dialogs
 		{
 			get { return _generatePhotos; }
 			set { SetProperty(ref _generatePhotos, value); }
+		}
+
+		private bool _generateRatings;
+		public bool GenerateRatings
+		{
+			get { return _generateRatings; }
+			set { SetProperty(ref _generateRatings, value); }
+		}
+
+		private int _desiredRating;
+		public int DesiredRating
+		{
+			get { return _desiredRating; }
+			set { SetProperty(ref _desiredRating, value); }
 		}
 
 		#endregion

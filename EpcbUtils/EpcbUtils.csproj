@@ -113,8 +113,10 @@
     <Compile Include="HtmlParserUtils.cs" />
     <Compile Include="LoggerUtils.cs" />
     <Compile Include="ManagerUtils.cs" />
+    <Compile Include="RatingsUtils.cs" />
     <Compile Include="Messages\StatusMessage.cs" />
     <Compile Include="PhotoUtils.cs" />
+    <Compile Include="PlayerStatistics.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

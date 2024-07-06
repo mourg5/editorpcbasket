@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EpcbModel
 {
@@ -35,6 +31,11 @@ namespace EpcbModel
 			TiroL = 50;
 			Rebotes = 50;
 			Asistencias = 50;
+		}
+
+		public Medias(int mediaDeseada, PlayerStatistics statistics, int demarcacion)
+		{
+
 		}
 
 		public void SetMediasToValue(int value)

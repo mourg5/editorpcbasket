@@ -273,15 +273,13 @@ namespace EpcbUtils
 						fileStream.Write(color, 0, 4);
 					}
 
-					fileStream.Position += offset; // fileStream.Length - width * height;
-
-					for (int i = 0; i < width * height; i++)
+					do
 					{
 						var color = fileStream.ReadByte();
 						var newColor = ReplaceColor(color);
 						fileStream.Position--;
 						fileStream.WriteByte(newColor);
-					}
+					} while (fileStream.Position <= fileStream.Length);
 
 					fileStream.Close();
 
@@ -423,7 +421,7 @@ namespace EpcbUtils
 				File.Copy(miniesc, Path.Combine(DbdatUtils.PcbPathForBitmaps, string.Format("DBDAT\\MINIESC\\EQBA{0:0000}.bmp", puntero)), true);
 				File.Copy(miniescAlpha, Path.Combine(DbdatUtils.PcbPathForBitmaps, string.Format("DBDAT\\MINIESC\\EQBA{0:0000}_ALPHA.bmp", puntero)), true);
 				File.Copy(nanoesc, Path.Combine(DbdatUtils.PcbPathForBitmaps, string.Format("DBDAT\\NANOESC\\EQBA{0:0000}.bmp", puntero)), true);
-				File.Copy(nanoesc, Path.Combine(DbdatUtils.PcbPathForBitmaps, string.Format("DBDAT\\RIDIESC\\EQBA{0:0000}.bmp", puntero)), true);
+				File.Copy(ridiesc, Path.Combine(DbdatUtils.PcbPathForBitmaps, string.Format("DBDAT\\RIDIESC\\EQBA{0:0000}.bmp", puntero)), true);
 
 			}
 			catch (Exception ex)

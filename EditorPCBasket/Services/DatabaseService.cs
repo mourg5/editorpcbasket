@@ -6,6 +6,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Editor_PCBasket___Mou.Services
 {
@@ -73,7 +74,7 @@ namespace Editor_PCBasket___Mou.Services
 
 			DataBase.SaveChanges();
 
-			TeamsList.Clear();
+			Application.Current.Dispatcher.Invoke(TeamsList.Clear);
 		}
 
 		#endregion
@@ -100,7 +101,7 @@ namespace Editor_PCBasket___Mou.Services
 			}
 			catch (Exception ex)
 			{
-				LoggerUtils.LogException(ex);			
+				LoggerUtils.LogException(ex);
 			}
 
 			try

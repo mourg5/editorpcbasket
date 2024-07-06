@@ -4,6 +4,7 @@ using EpcbUtils.Dialogs;
 using Ookii.Dialogs.Wpf;
 using Prism.Commands;
 using Prism.Mvvm;
+using Prism.Regions;
 using System;
 using System.IO;
 using System.Linq;
@@ -14,7 +15,7 @@ using static Editor_PCBasket___Mou.Config.NavigationEnums;
 
 namespace Editor_PCBasket___Mou.ViewModels.Settings
 {
-	public class SettingsViewModel : BindableBase
+	public class SettingsViewModel : BindableBase, INavigationAware
 	{
 		private INavigationService _navigationService;
 		private IDatabaseService _databaseService;
@@ -24,7 +25,6 @@ namespace Editor_PCBasket___Mou.ViewModels.Settings
 			_databaseService = databaseService;
 
 			InitializeCommands();
-			InitializeSettings();
 			CheckPcbPath(PcbPath);
 			CheckDatabase();
 		}
@@ -41,7 +41,11 @@ namespace Editor_PCBasket___Mou.ViewModels.Settings
 		public string PcbPath
 		{
 			get { return _pcbPath; }
-			set { SetProperty(ref _pcbPath, value); }
+			set
+			{
+				SetProperty(ref _pcbPath, value);
+				Properties.Settings.Default.Path = value;
+			}
 		}
 
 		private bool _managerOk;
@@ -137,6 +141,7 @@ namespace Editor_PCBasket___Mou.ViewModels.Settings
 
 		private void InitializeSettings()
 		{
+			PcbPath = Properties.Settings.Default.Path;
 			UseCotNationality = Properties.Settings.Default.UseCotNationality;
 			UseEurNationality = Properties.Settings.Default.UseEurNationality;
 			AdjustBirthDates = Properties.Settings.Default.AdjustBirthDates;
@@ -231,6 +236,7 @@ namespace Editor_PCBasket___Mou.ViewModels.Settings
 			Properties.Settings.Default.SettingsCompleted = true;
 			Properties.Settings.Default.Save();
 
+			DbdatUtils.PcbPath = PcbPath;
 			HexUtils.UseCotNationality = UseCotNationality;
 			HexUtils.UseEurNationality = UseEurNationality;
 		}
@@ -243,6 +249,10 @@ namespace Editor_PCBasket___Mou.ViewModels.Settings
 
 		private void ExecuteCancel()
 		{
+			Properties.Settings.Default.Path = DbdatUtils.PcbPath;
+			Properties.Settings.Default.UseCotNationality = HexUtils.UseCotNationality;
+			Properties.Settings.Default.UseEurNationality = HexUtils.UseEurNationality;
+
 			_navigationService.GoBack(NavigationRegion.MainRegion);
 		}
 
@@ -316,6 +326,20 @@ namespace Editor_PCBasket___Mou.ViewModels.Settings
 				DbcStatus = "No se han encontrado equipos generados";
 				DbcOk = false;
 			}
+		}
+
+		public void OnNavigatedTo(NavigationContext navigationContext)
+		{
+			InitializeSettings();
+		}
+
+		public bool IsNavigationTarget(NavigationContext navigationContext)
+		{
+			return true;
+		}
+
+		public void OnNavigatedFrom(NavigationContext navigationContext)
+		{
 		}
 
 		#endregion
