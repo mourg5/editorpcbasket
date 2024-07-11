@@ -1,6 +1,4 @@
-﻿using EpcbUtils.Messages;
-using GalaSoft.MvvmLight.Messaging;
-using System;
+﻿using System;
 using System.IO;
 using System.Windows.Threading;
 
@@ -36,8 +34,6 @@ namespace EpcbUtils
 				_logger = File.AppendText(LogFilePath);
 				_logger.WriteLine("[" + DateTime.Now.ToString() + "] " + str);
 				_logger.Close();
-
-				Messenger.Default.Send(new StatusMessage() { Message = str });
 			}));
 		}
 

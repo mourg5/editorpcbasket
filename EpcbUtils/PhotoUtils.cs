@@ -80,7 +80,7 @@ namespace EpcbUtils
 			var output = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\JUG{1:00000}.bmp", folder, puntero));
 			var palette = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Graficos\\palette.bmp");
 
-			var script = string.Format("/c magick {0} -resize {1} -crop {2} -type palette -compress none -remap {3} BMP3:{4}", input, size, crop, palette, output);
+			var script = string.Format("/c magick \"{0}\" -resize {1} -crop {2} -type palette -compress none -remap \"{3}\" BMP3:\"{4}\"", input, size, crop, palette, output);
 
 
 			ExecuteCmd(script);
@@ -129,7 +129,7 @@ namespace EpcbUtils
 				{
 					imageBytes = await _webClient.GetByteArrayAsync(url);
 				}
-				
+
 				var escudoFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\eq3d{0}.png", puntero));
 				File.WriteAllBytes(escudoFile, imageBytes);
 
@@ -152,12 +152,12 @@ namespace EpcbUtils
 
 			string input = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\eq3d{0}.png", puntero));
 			var output = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\EQBA{1:0000}.bmp", folder, puntero));
-			var script = string.Format("/c magick {0} -background black -alpha remove -alpha off -resize 84x84 -gravity center -extent 120x120 -type palette -compress none -remap {1} BMP3:{2}", input, palette, output);
+			var script = string.Format("/c magick \"{0}\" -background black -alpha remove -alpha off -resize 84x84 -gravity center -extent 120x120 -type palette -compress none -remap \"{1}\" BMP3:\"{2}\"", input, palette, output);
 
 			var inputAlpha = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\eq3d{0}_alpha.png", puntero));
 			var outputAlpha = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\EQBA{1:0000}_ALPHA.bmp", folder, puntero));
-			var scriptExtractAlpha = string.Format("/c magick {0} -alpha extract {1}", input, inputAlpha);
-			var scriptAlpha = string.Format("/c magick {0} -resize 84x84 -gravity center -background black -extent 120x120 -type palette -compress none -remap {1} BMP3:{2}", inputAlpha, palette, outputAlpha);
+			var scriptExtractAlpha = string.Format("/c magick \"{0}\" -alpha extract \"{1}\"", input, inputAlpha);
+			var scriptAlpha = string.Format("/c magick \"{0}\" -resize 84x84 -gravity center -background black -extent 120x120 -type palette -compress none -remap \"{1}\" BMP3:\"{2}\"", inputAlpha, palette, outputAlpha);
 
 			ExecuteCmd(script);
 			ExecuteCmd(scriptExtractAlpha);
@@ -171,14 +171,14 @@ namespace EpcbUtils
 
 			string input = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\eq3d{0}.png", puntero));
 			var output = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\EQBA{1:0000}.bmp", folder, puntero));
-			var tmpScript = string.Format("/c magick {0} -gravity center -background black -alpha remove -alpha off -resize 48x48 -extent 48x63 -type palette -compress none -remap {1} BMP3:{2}", input, palette, output);
-			var script = string.Format("/c magick {0} -background black -extent 54x70 -type palette -compress none -remap {1} BMP3:{2}", output, palette, output);
+			var tmpScript = string.Format("/c magick \"{0}\" -gravity center -background black -alpha remove -alpha off -resize 48x48 -extent 48x63 -type palette -compress none -remap \"{1}\" BMP3:\"{2}\"", input, palette, output);
+			var script = string.Format("/c magick \"{0}\" -background black -extent 54x70 -type palette -compress none -remap \"{1}\" BMP3:\"{2}\"", output, palette, output);
 
 			var inputAlpha = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\tmp\\eq3d{0}_alpha.png", puntero));
 			var outputAlpha = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\{0}\\EQBA{1:0000}_ALPHA.bmp", folder, puntero));
-			var scriptExtractAlpha = string.Format("/c magick {0} -alpha extract {1}", input, inputAlpha);
-			var tmpScriptAlpha = string.Format("/c magick {0} -gravity center -background black -resize 48x48 -extent 48x63 -type palette -compress none -remap {1} BMP3:{2}", inputAlpha, palette, outputAlpha);
-			var scriptAlpha = string.Format("/c magick {0} -background black -extent 54x70 -type palette -compress none -remap {1} BMP3:{2}", outputAlpha, palette, outputAlpha);
+			var scriptExtractAlpha = string.Format("/c magick \"{0}\" -alpha extract {1}", input, inputAlpha);
+			var tmpScriptAlpha = string.Format("/c magick \"{0}\" -gravity center -background black -resize 48x48 -extent 48x63 -type palette -compress none -remap \"{1}\" BMP3:\"{2}\"", inputAlpha, palette, outputAlpha);
+			var scriptAlpha = string.Format("/c magick \"{0}\" -background black -extent 54x70 -type palette -compress none -remap \"{1}\" BMP3:\"{2}\"", outputAlpha, palette, outputAlpha);
 
 			ExecuteCmd(tmpScript);
 			ExecuteCmd(script);
@@ -199,7 +199,7 @@ namespace EpcbUtils
 
 			File.WriteAllText(nanoFile, nanoScript);
 
-			var script = string.Format("/c magick -script {0}", nanoFile);
+			var script = string.Format("/c magick -script \"{0}\"", nanoFile);
 
 			ExecuteCmd(script);
 		}
@@ -216,7 +216,7 @@ namespace EpcbUtils
 
 			File.WriteAllText(nanoFile, nanoScript);
 
-			var script = string.Format("/c magick -script {0}", nanoFile);
+			var script = string.Format("/c magick -script \"{0}\"", nanoFile);
 
 			ExecuteCmd(script);
 		}
@@ -276,10 +276,11 @@ namespace EpcbUtils
 					do
 					{
 						var color = fileStream.ReadByte();
+						if (color < 0) color = 255;
 						var newColor = ReplaceColor(color);
 						fileStream.Position--;
 						fileStream.WriteByte(newColor);
-					} while (fileStream.Position <= fileStream.Length);
+					} while (fileStream.Position < fileStream.Length);
 
 					fileStream.Close();
 
@@ -329,15 +330,23 @@ namespace EpcbUtils
 
 		private static byte ReplaceColor(int color)
 		{
-			var originalColor = _bmp2ColorTable[color];
-			var newColor = _dinamicColorTable.IndexOf(originalColor);
-
-			if (newColor < 0)
+			try
 			{
-				return FindNearestColor(color);
-			}
+				var originalColor = _bmp2ColorTable[color];
+				var newColor = _dinamicColorTable.IndexOf(originalColor);
 
-			return (byte)newColor;
+				if (newColor < 0)
+				{
+					return FindNearestColor(color);
+				}
+
+				return (byte)newColor;
+			}
+			catch (Exception ex)
+			{
+				LoggerUtils.LogException(ex);
+				return 0;
+			}
 		}
 
 		private static byte FindNearestColor(int color)

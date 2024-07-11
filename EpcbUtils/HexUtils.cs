@@ -508,20 +508,18 @@ namespace EpcbUtils
 
 		private static byte GetNationalityByte(Pais nacionalidad)
 		{
-			if (UseCotNationality)
+			var countryByte = (byte)nacionalidad;
+
+			if (UseCotNationality && HtmlParserUtils.IsCotonou(nacionalidad))
 			{
-				return HtmlParserUtils.IsCotonou(nacionalidad)
-					? (byte)Pais.IRLANDA_DEL_NORTE
-					: (byte)nacionalidad;
+				countryByte = (byte)Pais.IRLANDA_DEL_NORTE;
 			}
-			if (UseEurNationality)
+			if (UseEurNationality && HtmlParserUtils.IsComunitario(nacionalidad))
 			{
-				return HtmlParserUtils.IsComunitario(nacionalidad)
-					? (byte)Pais.LUXEMBURGO
-					: (byte)nacionalidad;
+				countryByte = (byte)Pais.LUXEMBURGO;
 			}
 
-			return (byte)nacionalidad;
+			return countryByte;
 		}
 
 		private static List<string[]> _tacticas = new List<string[]>

@@ -16,23 +16,30 @@ namespace EpcbUtils
 
 			foreach (var player in players)
 			{
-				var stats = statistics[player.Puntero];
-				
-				var playerEff = stats.Efficiency / effAvg;
-				var playerPoints = stats.Points / pointsAvg;
-				
-				var effAdd = playerEff > 1
-					? 3 * playerEff
-					: 3 * -playerEff;
+				try
+				{
+					var stats = statistics[player.Puntero];
 
-				var pointsAdd = playerPoints > 1
-					? 1.5 * playerPoints
-					: 1.5 * -playerPoints;
+					var playerEff = stats.Efficiency / effAvg;
+					var playerPoints = stats.Points / pointsAvg;
 
-				var playerRating = (int)(desiredTeamRating + pointsAdd + effAdd);
-				playerRating = Math.Min(95, Math.Max(11, playerRating));
+					var effAdd = playerEff > 1
+						? 3 * playerEff
+						: 3 * -playerEff;
 
-				GeneratePlayerRating(player.Medias, stats, playerRating, player.Demarcacion);
+					var pointsAdd = playerPoints > 1
+						? 1.5 * playerPoints
+						: 1.5 * -playerPoints;
+
+					var playerRating = (int)(desiredTeamRating + pointsAdd + effAdd);
+					playerRating = Math.Min(95, Math.Max(11, playerRating));
+
+					GeneratePlayerRating(player.Medias, stats, playerRating, player.Demarcacion);
+				}
+				catch (Exception ex)
+				{
+					LoggerUtils.LogException(ex);
+				}
 			}
 
 			var averageRating = Math.Ceiling(players.Average(p => p.Medias.MediaQuinteto));
