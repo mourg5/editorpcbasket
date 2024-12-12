@@ -9,8 +9,8 @@ namespace EpcbModel
 		public Jugador()
 		{
 			Medias = new Medias();
-			Nacionalidad = Pais.ESPAÑA;
-			AnoNacimiento = 1990;
+			Nacionalidad = Pais.LUXEMBURGO;
+			AnoNacimiento = 1999;
 		}
 
 		public int JugadorId { get; set; }

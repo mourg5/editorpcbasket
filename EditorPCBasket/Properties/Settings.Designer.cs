@@ -94,5 +94,17 @@ namespace Editor_PCBasket___Mou.Properties {
                 this["AdjustBirthDates"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("14")]
+        public int MaxPlayers {
+            get {
+                return ((int)(this["MaxPlayers"]));
+            }
+            set {
+                this["MaxPlayers"] = value;
+            }
+        }
     }
 }

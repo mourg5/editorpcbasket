@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using EpcbModel;
@@ -12,6 +13,8 @@ namespace EpcbUtils
 		private static Random _rnd = new Random(DateTime.Now.Millisecond);
 		private static List<int> _dorsales = Enumerable.Range(0, 99).OrderBy(g => Guid.NewGuid()).ToList();
 		private static int _i = 0;
+
+		public static int MaxPlayers { get; set; }
 
 		public static Equipo GetEquipoFromHtml(string url, int pEquipo, int pJugador, bool generatePhotos, bool generateEscudos, int desiredRating = -1)
 		{
@@ -29,11 +32,11 @@ namespace EpcbUtils
 
 			if (generateEscudos)
 			{
-				var escudo = doc.DocumentNode.SelectSingleNode("//div[@class='identity__picture']").SelectSingleNode("img").Attributes["src"].Value;
+				var escudo = doc.DocumentNode.SelectSingleNode("//span[@class='identity__picture__box']").SelectSingleNode("img").Attributes["src"].Value;
 				PhotoUtils.CreateEscudos(escudo, pEquipo);
 			}
 
-			var nombreEquipo = doc.DocumentNode.SelectSingleNode("//div[@class='identity__picture']").SelectSingleNode("img").Attributes["alt"].Value;
+			var nombreEquipo = doc.DocumentNode.SelectSingleNode("//span[@class='identity__picture__box']").SelectSingleNode("img").Attributes["alt"].Value;
 
 			equipoRes.NombreCorto = nombreEquipo;
 			equipoRes.NombreLargo = nombreEquipo;
@@ -61,6 +64,15 @@ namespace EpcbUtils
 				nombre = nombre.Replace("\n", "");
 				nombre = nombre.Replace("  ", "");
 
+				var surname = nombre.Substring(nombre.IndexOf(' ') + 1).ToUpper();
+				var name = nombre.Substring(0, nombre.IndexOf(' '));
+
+				var completeName = string.Format("{0} {1}", name, surname);
+				if (equipoRes.Plantilla.Any(j => j.NombreLargo.Equals(completeName)))
+				{
+					break;
+				}
+
 				var urlJug = jugNode.ParentNode.ChildNodes[1].Attributes[1].Value;
 
 				PlayerStatistics playerStatistics;
@@ -69,27 +81,30 @@ namespace EpcbUtils
 				{
 					try
 					{
-						playerStatistics = new PlayerStatistics()
+						if (equipoRes.Plantilla.Count(j => j.NombreLargo.StartsWith(nombre.Substring(0, nombre.IndexOf(" ")))) < 1)
 						{
-							Points = double.Parse(jugador.Descendants("td").ElementAt(3).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
-							Rebounds = double.Parse(jugador.Descendants("td").ElementAt(4).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
-							Assists = double.Parse(jugador.Descendants("td").ElementAt(5).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
-							Minutes = double.Parse(jugador.Descendants("td").ElementAt(8).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
-							Pct3Pointers = double.Parse(jugador.Descendants("td").ElementAt(9).InnerText.Replace("%", "").Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")) / 100,
-							PctFieldGoalds = double.Parse(jugador.Descendants("td").ElementAt(10).InnerText.Replace("%", "").Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "35")) / 100,
-							PctFreeThrows = double.Parse(jugador.Descendants("td").ElementAt(11).InnerText.Replace("%", "").Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "60")) / 100,
-							OffensiveRebounds = double.Parse(jugador.Descendants("td").ElementAt(12).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
-							Steals = double.Parse(jugador.Descendants("td").ElementAt(15).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
-							TurnOvers = double.Parse(jugador.Descendants("td").ElementAt(16).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
-							Blocks = double.Parse(jugador.Descendants("td").ElementAt(17).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
-							Fouls = double.Parse(jugador.Descendants("td").ElementAt(18).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
-							Efficiency = double.Parse(jugador.Descendants("td").ElementAt(20).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
-							HighestPoints = double.Parse(jugador.Descendants("td").ElementAt(21).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
-							HighestRebounds = double.Parse(jugador.Descendants("td").ElementAt(22).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
-							HighestAssists = double.Parse(jugador.Descendants("td").ElementAt(23).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator)),
-						};
+							playerStatistics = new PlayerStatistics()
+							{
+								Points = double.Parse(jugador.Descendants("td").ElementAt(3).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")),
+								Rebounds = double.Parse(jugador.Descendants("td").ElementAt(4).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")),
+								Assists = double.Parse(jugador.Descendants("td").ElementAt(5).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")),
+								Minutes = double.Parse(jugador.Descendants("td").ElementAt(8).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")),
+								Pct3Pointers = double.Parse(jugador.Descendants("td").ElementAt(9).InnerText.Replace("%", "").Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")) / 100,
+								PctFieldGoalds = double.Parse(jugador.Descendants("td").ElementAt(10).InnerText.Replace("%", "").Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "35")) / 100,
+								PctFreeThrows = double.Parse(jugador.Descendants("td").ElementAt(11).InnerText.Replace("%", "").Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "60")) / 100,
+								OffensiveRebounds = double.Parse(jugador.Descendants("td").ElementAt(12).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")),
+								Steals = double.Parse(jugador.Descendants("td").ElementAt(15).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")),
+								TurnOvers = double.Parse(jugador.Descendants("td").ElementAt(16).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")),
+								Blocks = double.Parse(jugador.Descendants("td").ElementAt(17).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")),
+								Fouls = double.Parse(jugador.Descendants("td").ElementAt(18).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")),
+								Efficiency = double.Parse(jugador.Descendants("td").ElementAt(20).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")),
+								HighestPoints = double.Parse(jugador.Descendants("td").ElementAt(21).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")),
+								HighestRebounds = double.Parse(jugador.Descendants("td").ElementAt(22).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")),
+								HighestAssists = double.Parse(jugador.Descendants("td").ElementAt(23).InnerText.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator).Replace("-", "0")),
+							};
 
-						teamStatistics.Add(punteroJug, playerStatistics);
+							teamStatistics.Add(punteroJug, playerStatistics);
+						}
 					}
 					catch (Exception ex)
 					{
@@ -109,7 +124,7 @@ namespace EpcbUtils
 					LoggerUtils.LogException(ex);
 				}
 
-				if (equipoRes.Plantilla.Count > 12) break;
+				if (equipoRes.Plantilla.Count >= MaxPlayers) break;
 			}
 
 			if (desiredRating > 0)
@@ -148,20 +163,21 @@ namespace EpcbUtils
 			var doc = web.Load("https://www.proballers.com" + url);
 
 			// Nombre
-			var nombre = doc.DocumentNode.SelectSingleNode("//div[@class='identity__picture identity__picture--player']").SelectSingleNode("img").Attributes["alt"].Value;
+			var nombre = doc.DocumentNode.SelectSingleNode("//span[@class='identity__picture__box']").SelectSingleNode("img").Attributes["alt"].Value;
 
-			var apellido = nombre.Substring(nombre.IndexOf(' ') + 1);
-			var nom = nombre.Substring(0, nombre.IndexOf(' '));
+			var surname = nombre.Substring(nombre.IndexOf(' ') + 1).ToUpper();
+			var name = nombre.Substring(0, nombre.IndexOf(' '));
 
-			jugPlantilla.NombreCorto = apellido.ToUpper();
-			jugPlantilla.NombreLargo = nom + " " + apellido.ToUpper();
+			jugPlantilla.NombreCorto = surname;
+			jugPlantilla.NombreLargo = string.Format("{0} {1}", name, surname);
 
-			var infoJug = doc.DocumentNode.SelectSingleNode("//div[@class='identity__description']").ChildNodes["ul"];
+			var playerProfil = doc.DocumentNode.SelectSingleNode("//div[@class='identity__stats__profil']");
+			var biography = doc.DocumentNode.SelectSingleNode("//div[@class='banner__biography__content']").ChildNodes.ElementAt(3).InnerText;
 
 			// Fecha nacimiento
 			try
 			{
-				var birth = infoJug.ChildNodes.ElementAt(1).InnerText;
+				var birth = playerProfil.ChildNodes.ElementAt(1).ChildNodes.ElementAt(3).InnerText.Replace("\n", "").Trim();
 				var fnac = birth.Substring(birth.IndexOf(",") + 2, 4);
 
 				jugPlantilla.AnoNacimiento = int.Parse(fnac);
@@ -174,7 +190,8 @@ namespace EpcbUtils
 			// Altura y peso 
 			try
 			{
-				var height = infoJug.ChildNodes.ElementAt(5).InnerText;
+
+				var height = playerProfil.ChildNodes.ElementAt(3).ChildNodes.ElementAt(3).InnerText.Replace("\n", "").Trim();
 				var alt = height.Substring(0, 4).Replace("m", "");
 
 				jugPlantilla.Altura = int.Parse(alt);
@@ -189,12 +206,17 @@ namespace EpcbUtils
 			// Nacionalidad
 			try
 			{
-				var nacionalidad = infoJug.ChildNodes.ElementAt(3).InnerText;
-				if (nacionalidad.Contains(','))
+				jugPlantilla.Nacionalidad = Pais.LUXEMBURGO;
+
+				foreach (var country in CountryCodes)
 				{
-					nacionalidad = nacionalidad.Substring(0, nacionalidad.IndexOf(','));
+					if (biography.Substring(0, biography.IndexOf('.')).Contains(country.Key))
+					{
+						jugPlantilla.Nacionalidad = (Pais)country.Value;
+						break;
+					}
 				}
-				jugPlantilla.Nacionalidad = NationalityToPais(nacionalidad);
+				//jugPlantilla.Nacionalidad = NationalityToPais(nacionalidad);
 
 				if (IsCotonou(jugPlantilla.Nacionalidad))
 				{
@@ -209,8 +231,8 @@ namespace EpcbUtils
 			// Posición
 			try
 			{
-				var pos = infoJug.ChildNodes.ElementAt(7).InnerText;
-				jugPlantilla.Demarcacion = StringToPosition(pos);
+				int pos = SearchPosition(biography);
+				jugPlantilla.Demarcacion = pos;
 			}
 			catch (Exception)
 			{
@@ -222,7 +244,7 @@ namespace EpcbUtils
 			{
 				try
 				{
-					var foto = doc.DocumentNode.SelectSingleNode("//div[@class='identity__picture identity__picture--player']").SelectSingleNode("img").Attributes["src"].Value;
+					var foto = doc.DocumentNode.SelectSingleNode("//span[@class='identity__picture__box']").SelectSingleNode("img").Attributes["src"].Value;
 					PhotoUtils.CreatePhotos(foto, jugPlantilla);
 				}
 				catch (Exception ex)
@@ -239,6 +261,30 @@ namespace EpcbUtils
 			return jugPlantilla;
 		}
 
+		private static int SearchPosition(string info)
+		{
+			info = info.ToLower();
+			if (info.Contains("point guard"))
+			{
+				return 0;
+			}
+			if (info.Contains("shooting guard"))
+			{
+				return 1;
+			}
+			if (info.Contains("center"))
+			{
+				return 4;
+			}
+			if (info.Contains("power forward"))
+			{
+				return 3;
+			}
+
+			return 2;
+		}
+
+		// Deprecated: Proballers ha cambiado la estructura interna
 		private static int StringToPosition(string pos)
 		{
 			var str = pos.Substring(0, pos.IndexOf(" "));
@@ -284,57 +330,82 @@ namespace EpcbUtils
 		{
 			switch (pais)
 			{
+				case (Pais.ANGOLA):
 				case (Pais.BENIN):
+				case (Pais.BOTSWANA):
 				case (Pais.BURKINA_FASO):
-				case (Pais.CABO_VERDE):
-				case (Pais.COSTA_DE_MARFIL):
-				case (Pais.GAMBIA):
-				case (Pais.GHANA):
-				case (Pais.GUINEA):
-				case (Pais.GUINEA_BISSAU):
-				case (Pais.LIBERIA):
-				case (Pais.MALI):
-				case (Pais.MAURITANIA):
-				case (Pais.NIGER):
-				case (Pais.NIGERIA):
-				case (Pais.SENEGAL):
-				case (Pais.SIERRA_LEONA):
-				case (Pais.TOGO):
-
-				case (Pais.CAMERÚN):
-				case (Pais.REPUBLICA_CENTRO):
-				case (Pais.CHAD):
-				case (Pais.CONGO):
-				case (Pais.GUINEA_ECUATORIANA):
-				case (Pais.GABON):
-				case (Pais.SANTO_TOME_Y_PR):
-
 				case (Pais.BURUNDI):
-				case (Pais.KENIA):
-				case (Pais.RUANDA):
-				case (Pais.SUDAN):
-				case (Pais.TANZANIA):
-				case (Pais.UGANDA):
-
+				case (Pais.CABO_VERDE):
+				case (Pais.CAMERÚN):
+				case (Pais.CHAD):
 				case (Pais.COMOROS):
+				case (Pais.CONGO):
+				case (Pais.COSTA_DE_MARFIL):
 				case (Pais.DJIBOUTI):
 				case (Pais.ERITREA):
 				case (Pais.ETIOPIA):
+				case (Pais.GABON):
+				case (Pais.GAMBIA):
+				case (Pais.GHANA):
+				case (Pais.GUINEA_ECUATORIANA):
+				case (Pais.GUINEA):
+				case (Pais.GUINEA_BISSAU):
+				case (Pais.ISLAS_MAURICIOS):
+				case (Pais.KENIA):
+				case (Pais.LESOTHO):
+				case (Pais.LIBERIA):
 				case (Pais.MADAGASCAR):
 				case (Pais.MALAWI):
-				case (Pais.ISLAS_MAURICIOS):
+				case (Pais.MALI):
+				case (Pais.MAURITANIA):
+				case (Pais.MOZAMBIQUE):
+				case (Pais.NAMIBIA):
+				case (Pais.NIGER):
+				case (Pais.NIGERIA):
+				case (Pais.REPUBLICA_CENTRO):
+				case (Pais.RUANDA):
+				case (Pais.SANTO_TOME_Y_PR):
+				case (Pais.SENEGAL):
 				case (Pais.SEYCHELLES):
+				case (Pais.SIERRA_LEONA):
 				case (Pais.SOMALIA):
+				case (Pais.SUAZILANDIA):
+				case (Pais.SUDAFRICA):
+				case (Pais.SUDAN):
+				case (Pais.TANZANIA):
+				case (Pais.TOGO):
+				case (Pais.UGANDA):
 				case (Pais.ZAMBIA):
 				case (Pais.ZIMBABWE):
 
-				case (Pais.ANGOLA):
-				case (Pais.BOTSWANA):
-				case (Pais.SUAZILANDIA):
-				case (Pais.LESOTHO):
-				case (Pais.MOZAMBIQUE):
-				case (Pais.NAMIBIA):
-				case (Pais.SUDAFRICA):
+				case (Pais.ANTIGUA_Y_BARBU):
+				case (Pais.LAS_BAHAMAS):
+				case (Pais.BARBADOS):
+				case (Pais.BELIZE):
+				case (Pais.DOMINICA):
+				case (Pais.GRANADA):
+				case (Pais.HAITI):
+				case (Pais.JAMAICA):
+				case (Pais.REPUBLICA_DOMINICANA):
+				case (Pais.SAN_KITTS_Y_NEVIS):
+				case (Pais.SAN_VICENTE):
+				case (Pais.SANTA_LUCIA):
+				case (Pais.SURINAM):
+				case (Pais.TRINIDAD_Y_TOBAGO):
+
+				case (Pais.FIJI):
+				case (Pais.KIRIBATI):
+				case (Pais.ISLAS_MARSHALL):
+				case (Pais.MICRONESIA):
+				case (Pais.NAURU):
+				case (Pais.PALAU):
+				case (Pais.PAPUA_NUEVA_GUINEA):
+				case (Pais.SAMOA):
+				case (Pais.ISLAS_SALOMON):
+				case (Pais.TONGA):
+				case (Pais.TUVALU):
+				case (Pais.VANUATU):
+
 					return true;
 			}
 			return false;
@@ -710,6 +781,7 @@ namespace EpcbUtils
 			{"Algeria", 66},
 			{"Trinidad and Tobago", 67},
 			{"Senegal", 68},
+			{"Sénégal", 68},
 			{"Surinam", 69},
 			{"Zambia", 70},
 			{"Cape Verde", 71},

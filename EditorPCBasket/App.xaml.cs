@@ -41,6 +41,7 @@ namespace Editor_PCBasket___Mou
 			HexUtils.AnoInicio = (short)Settings.Default.AnoInicio;
 			HexUtils.UseCotNationality = Settings.Default.UseCotNationality;
 			HexUtils.UseEurNationality = Settings.Default.UseEurNationality;
+			HtmlParserUtils.MaxPlayers = Settings.Default.MaxPlayers;
 
 			LoggerUtils.LogString(string.Format("============= Iniciando Editor PCBasket. Versión {0} =============", Assembly.GetExecutingAssembly().GetName().Version));
 

@@ -21,11 +21,11 @@ namespace EpcbUtils
 
 		public static void CreatePhotos(string url, Jugador jugador)
 		{
-			var thread = new Thread(() => CreatePhotosThread(url, jugador));
+			var thread = new Thread(() => CreatePhotosAsync(url, jugador));
 			thread.Start();
 		}
 
-		private static async void CreatePhotosThread(string url, Jugador jugador)
+		private static async void CreatePhotosAsync(string url, Jugador jugador)	
 		{
 			try
 			{
@@ -94,7 +94,7 @@ namespace EpcbUtils
 				var minifoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\MINIFOTO\\JUG{0:00000}.bmp", puntero));
 				var nanofoto = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("Graficos\\NANOFOTO\\JUG{0:00000}.bmp", puntero));
 
-				Remap(medfoto, 61, 89, 267);
+				Remap(medfoto, 61, 89);
 				Remap(minifoto, 28, 41);
 				Remap(nanofoto, 19, 27);
 			}
@@ -110,11 +110,11 @@ namespace EpcbUtils
 
 		public static void CreateEscudos(string url, int puntero)
 		{
-			var thread = new Thread(() => CreateEscudosThread(url, puntero));
+			var thread = new Thread(() => CreateEscudosAsync(url, puntero));
 			thread.Start();
 		}
 
-		private static async void CreateEscudosThread(string url, int puntero)
+		private static async void CreateEscudosAsync(string url, int puntero)
 		{
 			try
 			{
@@ -232,8 +232,8 @@ namespace EpcbUtils
 
 				Remap(_3desc, 120, 120);
 				Remap(miniesc, 54, 70);
-				Remap(nanoesc, 30, 30, 60);
-				Remap(ridiesc, 18, 18, 36);
+				Remap(nanoesc, 30, 30);
+				Remap(ridiesc, 18, 18);
 			}
 			catch (Exception ex)
 			{
@@ -261,7 +261,9 @@ namespace EpcbUtils
 			_dinamicPalette = ReadPalette(dinamicPalette);
 		}
 
-		public static void Remap(string filePath, int width, int height, int offset = 0)
+		private static int _remapRetries;
+
+		public static void Remap(string filePath, int width, int height)
 		{
 			try
 			{
@@ -284,12 +286,20 @@ namespace EpcbUtils
 
 					fileStream.Close();
 
+					_remapRetries = 0;
+
 					LoggerUtils.LogString(string.Format("[GRAPHICS] Remapped file {0} to Dinamic palette", filePath));
 				}
 			}
 			catch (Exception ex)
 			{
 				LoggerUtils.LogException(ex);
+				if (_remapRetries < 5)
+				{
+					Thread.Sleep(100);
+					Remap(filePath, width, height);
+				}
+				_remapRetries++;
 			}
 		}
 

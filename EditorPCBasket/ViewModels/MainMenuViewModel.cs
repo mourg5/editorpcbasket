@@ -34,11 +34,7 @@ namespace Editor_PCBasket___Mou.ViewModels
 		private void InitializeDbThread()
 		{
 			try
-			{								
-				//PhotoUtils.CreateEscudos("http://clinicadentallopezgil.com/fll2.png", 12);
-				//PhotoUtils.CreateEscudos("https://www.proballers.com/api/getTeamLogo?id=2443&width=300", 2);
-
-				//HtmlParserUtils.GetEquipoFromHtml("https://www.proballers.com/basketball/team/13356/basquet-girona", 7, 39, true);
+			{
 				var db = ((PrismApplication)App.Current).Container.Resolve<IDatabaseService>();
 				DialogHelper.CloseDialog();
 			}

@@ -139,12 +139,20 @@ namespace Editor_PCBasket___Mou.ViewModels.Settings
 			set { SetProperty(ref _adjustBirthDates, value); }
 		}
 
+		private int _maxPlayer;
+		public int MaxPlayers
+		{
+			get { return _maxPlayer; }
+			set { SetProperty(ref _maxPlayer, value); }
+		}
+
 		private void InitializeSettings()
 		{
 			PcbPath = Properties.Settings.Default.Path;
 			UseCotNationality = Properties.Settings.Default.UseCotNationality;
 			UseEurNationality = Properties.Settings.Default.UseEurNationality;
 			AdjustBirthDates = Properties.Settings.Default.AdjustBirthDates;
+			MaxPlayers = Properties.Settings.Default.MaxPlayers;
 		}
 
 		#endregion
@@ -234,11 +242,13 @@ namespace Editor_PCBasket___Mou.ViewModels.Settings
 			Properties.Settings.Default.UseEurNationality = UseEurNationality;
 			Properties.Settings.Default.AdjustBirthDates = AdjustBirthDates;
 			Properties.Settings.Default.SettingsCompleted = true;
+			Properties.Settings.Default.MaxPlayers = MaxPlayers;
 			Properties.Settings.Default.Save();
 
 			DbdatUtils.PcbPath = PcbPath;
 			HexUtils.UseCotNationality = UseCotNationality;
 			HexUtils.UseEurNationality = UseEurNationality;
+			HtmlParserUtils.MaxPlayers = MaxPlayers;
 		}
 
 		private bool CanExecuteAccept()

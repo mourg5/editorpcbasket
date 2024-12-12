@@ -188,7 +188,7 @@
                                 <TextBlock Margin="8,0,0,0"
                                    VerticalAlignment="Center"
                                    Foreground="{DynamicResource MaterialDesign.Brush.Badged.DarkForeground}"
-                                   Text="Exportación de datos" />
+                                   Text="Importación/Exportación de datos" />
                             </StackPanel>
                         </DataTemplate>
                     </GroupBox.HeaderTemplate>
@@ -196,6 +196,12 @@
                         <CheckBox Content="Exportar países con ficha Europea como no extranjeros" Style="{StaticResource MaterialDesignFilterChipPrimaryCheckBox}" IsChecked="{Binding UseEurNationality}" />
                         <CheckBox Content="Exportar países con ficha Cotonou como no extranjeros" Style="{StaticResource MaterialDesignFilterChipPrimaryCheckBox}" IsChecked="{Binding UseCotNationality}"/>
                         <CheckBox Content="Ajustar fechas de nacimiento a la temporada del MANAGER.EXE" Style="{StaticResource MaterialDesignFilterChipPrimaryCheckBox}" IsChecked="{Binding AdjustBirthDates}" />
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Número máximo de jugadores importados desde Proballers:" VerticalAlignment="Center"/>
+                            <TextBox Margin="5,2" Width="30" HorizontalContentAlignment="Center"  VerticalAlignment="Center" HorizontalAlignment="Left"
+                             PreviewTextInput="NumberValidationTextBox"
+                             Text="{Binding MaxPlayers}"/>
+                        </StackPanel>
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
