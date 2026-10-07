@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, ArrowRight, Home, Database, Trophy } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Home, Database, Trophy, BarChart3 } from 'lucide-react';
 import { NavigationView } from '../types/pcbasket';
 
 interface HeaderProps {
@@ -17,6 +17,7 @@ const VIEW_TITLES: Record<NavigationView, string> = {
   MainMenuView: 'Menú Principal',
   TeamsView: 'Gestión de Equipos',
   PlayersView: 'Buscador de Jugadores',
+  StatsDashboardView: 'Análisis y Estadísticas de Liga',
   ManagerView: 'Herramientas MANAGER.EXE',
   SettingsView: 'Ajustes y Configuración',
 };
@@ -71,6 +72,17 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               <Home className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => onNavigate('StatsDashboardView')}
+              title="Estadísticas y Balance de Liga"
+              className={`p-2 rounded-lg transition-colors flex items-center justify-center ${
+                currentView === 'StatsDashboardView'
+                  ? 'bg-white/20 text-[#ffce42]'
+                  : 'text-white hover:bg-white/10 hover:text-[#ffce42]'
+              }`}
+            >
+              <BarChart3 className="w-5 h-5" />
             </button>
           </div>
 

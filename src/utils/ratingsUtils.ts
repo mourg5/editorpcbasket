@@ -429,3 +429,78 @@ function generateCRating(
     attempts++;
   }
 }
+
+/**
+ * Calculates a player's annual salary / contract in Millions of pesetas (M)
+ * based on PC Basket market valuations, overall quality and foreign status.
+ */
+export function calculatePlayerSalary(player: Jugador): number {
+  if (typeof player.contrato === 'number' && player.contrato > 0) {
+    return player.contrato;
+  }
+  const rating = calculateMediaQuinteto(player.medias);
+  let salary = 15;
+  if (rating >= 92) {
+    salary = 240 + (rating - 92) * 20; // 240 - 380M
+  } else if (rating >= 85) {
+    salary = 150 + (rating - 85) * 12; // 150 - 234M
+  } else if (rating >= 78) {
+    salary = 95 + (rating - 78) * 7.5; // 95 - 147.5M
+  } else if (rating >= 70) {
+    salary = 55 + (rating - 70) * 5; // 55 - 95M
+  } else if (rating >= 60) {
+    salary = 30 + (rating - 60) * 2.5; // 30 - 55M
+  } else {
+    salary = Math.max(12, Math.round(rating * 0.45));
+  }
+
+  // Premium for non-national / marquee players in European leagues
+  if (player.nacionalidad === 2 || player.nacionalidad === 3) {
+    salary = Math.round(salary * 1.15);
+  }
+
+  return Math.round(salary);
+}
+
+/**
+ * Calculates total payroll and salary distribution for a team's roster
+ */
+export function calculateTeamPayroll(plantilla: Jugador[]): {
+  total: number;
+  starters: number;
+  bench: number;
+  maxSalaryPlayer: { player: Jugador; salary: number } | null;
+  avgSalary: number;
+} {
+  if (!plantilla || plantilla.length === 0) {
+    return { total: 0, starters: 0, bench: 0, maxSalaryPlayer: null, avgSalary: 0 };
+  }
+
+  let total = 0;
+  let starters = 0;
+  let bench = 0;
+  let maxSalary = -1;
+  let maxSalaryPlayer: { player: Jugador; salary: number } | null = null;
+
+  plantilla.forEach((player, idx) => {
+    const salary = calculatePlayerSalary(player);
+    total += salary;
+    if (idx < 5) {
+      starters += salary;
+    } else {
+      bench += salary;
+    }
+    if (salary > maxSalary) {
+      maxSalary = salary;
+      maxSalaryPlayer = { player, salary };
+    }
+  });
+
+  return {
+    total,
+    starters,
+    bench,
+    maxSalaryPlayer,
+    avgSalary: Math.round((total / plantilla.length) * 10) / 10,
+  };
+}

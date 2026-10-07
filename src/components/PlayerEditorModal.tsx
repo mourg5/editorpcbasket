@@ -16,6 +16,7 @@ import {
   calculateMediaQuinteto,
   calculateMediaPlantilla,
   generatePlayerRating,
+  calculatePlayerSalary,
 } from '../utils/ratingsUtils';
 
 interface PlayerEditorModalProps {
@@ -269,6 +270,26 @@ export const PlayerEditorModal: React.FC<PlayerEditorModalProps> = ({
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <label className="text-[11px] font-semibold text-slate-400 block mb-1">
+                  Contrato (M)
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  placeholder={`Auto (${calculatePlayerSalary({ ...player, contrato: undefined })}M)`}
+                  value={player.contrato ?? ''}
+                  onChange={(e) =>
+                    handleFieldChange(
+                      'contrato',
+                      e.target.value === '' ? undefined : parseInt(e.target.value) || 0
+                    )
+                  }
+                  title="Salario/Ficha anual en Millones (M). Deja vacío para cálculo automático."
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-emerald-400 font-mono font-bold text-center focus:border-[#ffce42] focus:outline-none"
+                />
               </div>
 
               <div className="col-span-3">

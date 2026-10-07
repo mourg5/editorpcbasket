@@ -128,107 +128,272 @@ class ByteReader {
 }
 
 export function readEquipoBytes(buffer: ArrayBuffer, defaultPuntero: number = 101): Equipo {
-  const reader = new ByteReader(buffer);
+  const u8 = new Uint8Array(buffer);
+  const view = new DataView(buffer);
 
-  // Skip header: "Copyright (c)1997 Dinamic Multimedia" (36 bytes) + 6 bytes = 42 bytes
-  reader.skip(42);
+  // 1. Locate start of Team Data (skip Dinamic Copyright if present)
+  let startOffset = 0;
+  let asciiHead = '';
+  for (let i = 0; i < Math.min(80, u8.length); i++) {
+    asciiHead += String.fromCharCode(u8[i]);
+  }
 
-  const nombreCorto = reader.readDinamicField();
-  const pabellon = reader.readDinamicField();
-  const bytePais = reader.readByte();
-  const aforo = reader.readInt16();
-  reader.skip(2);
-  const nombreLargo = reader.readDinamicField();
+  if (asciiHead.includes('Dinamic Multimedia')) {
+    const idx = asciiHead.indexOf('Dinamic Multimedia') + 'Dinamic Multimedia'.length;
+    startOffset = idx + 6;
+  } else if (u8.length >= 42 && (asciiHead.startsWith('Copyright') || u8[0] === 0x43)) {
+    startOffset = 42;
+  }
 
-  reader.skip(4);
-  reader.readDinamicField(); // C. Social
-  reader.skip(6); // Fundación + 4B
-  reader.readDinamicField(); // Presidente
-  const presupuesto = reader.readInt16();
+  // Scan first 64 bytes for a valid Dinamic string length if needed
+  if (startOffset > u8.length - 100 || (u8[startOffset] === 0 && u8[startOffset + 1] === 0)) {
+    for (let i = 0; i < Math.min(64, u8.length - 20); i++) {
+      const len = u8[i] | (u8[i + 1] << 8);
+      if (len >= 3 && len <= 20) {
+        const testStr = DinamicEncoding.getString(u8.subarray(i + 2, i + 2 + len));
+        if (/^[A-Z0-9ÁÉÍÓÚÑ -]{3,}$/i.test(testStr)) {
+          startOffset = i;
+          break;
+        }
+      }
+    }
+  }
 
-  reader.skip(6);
-  reader.readDinamicField(); // Patrocinador
-  reader.readDinamicField(); // Equipador
-  reader.skip(17); // 2B + estadísticas
-  reader.skip(245); // Tactics block
+  let pos = startOffset;
 
-  reader.skip(2); // Coach id
-  const entrenador = reader.readDinamicField();
-  reader.readDinamicField(); // Coach long name
-  reader.skip(15); // Coach stats
-  reader.skip(2); // 2nd coach id
-  reader.readDinamicField();
-  reader.readDinamicField();
-  reader.skip(14); // 2nd coach stats
+  const readDinField = (): string => {
+    if (pos + 2 > u8.length) return '';
+    const len = u8[pos] | (u8[pos + 1] << 8);
+    pos += 2;
+    if (len <= 0 || len > 200 || pos + len > u8.length) {
+      return '';
+    }
+    const strBytes = u8.subarray(pos, pos + len);
+    pos += len;
+    return DinamicEncoding.getString(strBytes);
+  };
+
+  const nombreCorto = readDinField();
+  const pabellon = readDinField();
+  const bytePais = pos < u8.length ? u8[pos++] : 22;
+  const aforo = pos + 2 <= u8.length ? view.getInt16(pos, true) : 3500;
+  pos += 2;
+  pos += 2; // skip 2 bytes
+  const nombreLargo = readDinField();
+
+  pos += 4; // skip 4 bytes
+  readDinField(); // C. Social
+  pos += 6; // Fundación (2B) + 4B = 6B
+  readDinField(); // Presidente
+  const presupuesto = pos + 2 <= u8.length ? view.getInt16(pos, true) : 500;
+  pos += 2;
+
+  pos += 6;
+  readDinField(); // Patrocinador
+  readDinField(); // Equipador
+  pos += 17; // 2B + estadísticas (15B)
+  pos += 243; // Tactics block (14B) + Relleno (229B)
+
+  // Coach 1 ID
+  let coach1Id = 0;
+  if (pos + 2 <= u8.length) {
+    coach1Id = view.getInt16(pos, true);
+    pos += 2;
+  }
+
+  let detectedPuntero = defaultPuntero;
+  if (defaultPuntero === 101 && coach1Id > 0 && coach1Id < 30000) {
+    const calcPuntero = Math.floor((coach1Id + 1) / 2);
+    if (calcPuntero > 0 && calcPuntero < 9999) {
+      detectedPuntero = calcPuntero;
+    }
+  }
+
+  const entrenador = readDinField();
+
+  // 2. Scan entire DBC file for genuine Player records
+  // This guarantees finding all players even if coach data or statistics blocks vary.
+  interface PlayerCandidate {
+    offset: number;
+    puntero: number;
+    dorsal: number;
+    nombreCorto: string;
+    nombreLargo: string;
+    afterNamesOffset: number;
+  }
+
+  const candidates: PlayerCandidate[] = [];
+  const searchStart = Math.max(40, startOffset + 50);
+
+  for (let i = searchStart; i < u8.length - 80; i++) {
+    if (u8[i] === 1) { // Player record control byte = 0x01
+      const pId = u8[i + 1] | (u8[i + 2] << 8);
+      const dorsal = u8[i + 3];
+      const shortLen = u8[i + 4] | (u8[i + 5] << 8);
+
+      if (dorsal <= 99 && shortLen >= 1 && shortLen <= 32 && pId >= 0) {
+        const shortNameBytes = u8.subarray(i + 6, i + 6 + shortLen);
+        const sName = DinamicEncoding.getString(shortNameBytes);
+
+        if (sName.trim().length >= 1 && !/[\x00-\x1F\x7F=<>]/.test(sName)) {
+          const longLenOffset = i + 6 + shortLen;
+          if (longLenOffset + 2 < u8.length) {
+            const longLen = u8[longLenOffset] | (u8[longLenOffset + 1] << 8);
+            if (longLen >= 1 && longLen <= 50) {
+              const longNameBytes = u8.subarray(longLenOffset + 2, longLenOffset + 2 + longLen);
+              const lName = DinamicEncoding.getString(longNameBytes);
+
+              if (lName.trim().length >= 1 && !/[\x00-\x1F\x7F=<>]/.test(lName)) {
+                candidates.push({
+                  offset: i,
+                  puntero: pId,
+                  dorsal,
+                  nombreCorto: sName.trim(),
+                  nombreLargo: lName.trim(),
+                  afterNamesOffset: longLenOffset + 2 + longLen,
+                });
+                i += 6 + shortLen + 2 + longLen;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 
   const plantilla: Jugador[] = [];
-  let currentYear = new Date().getFullYear();
+  const currentYear = new Date().getFullYear();
 
-  while (reader.pos + 30 < buffer.byteLength) {
-    const control = reader.readByte();
-    if (control !== 1) break;
+  for (let cIdx = 0; cIdx < candidates.length; cIdx++) {
+    const cand = candidates[cIdx];
+    const nextOffset = cIdx + 1 < candidates.length ? candidates[cIdx + 1].offset : u8.length;
+    let pPos = cand.afterNamesOffset;
 
-    const punteroJug = reader.readInt16();
-    const dorsal = reader.readByte();
-    const jNombreCorto = reader.readDinamicField();
-    const jNombreLargo = reader.readDinamicField();
+    pPos += 2; // posPlantilla (1B) + 0 (1B)
 
-    reader.skip(2); // orden plantilla
-    const demarcacion = (reader.readByte() - 1) as Demarcacion;
-    reader.skip(8); // tácticas ataque
-    const jPais = reader.readByte();
-    const colorPiel = reader.readByte() > 0;
-    reader.skip(6);
-    const anoNac = reader.readInt16();
-    const altura = reader.readByte();
-    const peso = reader.readByte();
+    // Demarcacion
+    const rawDemarcacion = pPos < u8.length ? u8[pPos++] - 1 : 2;
+    const demarcacion = (rawDemarcacion >= 0 && rawDemarcacion <= 4 ? rawDemarcacion : 2) as Demarcacion;
+
+    pPos += 8; // Tácticas ataque (8B)
+
+    const jPais = pPos < u8.length ? u8[pPos++] : 22;
+    const colorPiel = pPos < u8.length ? u8[pPos++] > 0 : false;
+
+    pPos += 6; // Hair/beard (2B) + 0 (1B) + pos bis (1B) + birth day/month (2B)
+
+    let anoNac = pPos + 2 <= u8.length ? view.getInt16(pPos, true) : currentYear - 24;
+    pPos += 2;
+    if (anoNac < 100 && anoNac > 0) {
+      anoNac += 1900;
+    } else if (anoNac <= 1940 || anoNac > 2030) {
+      anoNac = currentYear - 24;
+    }
+
+    const alturaRaw = pPos < u8.length ? u8[pPos++] : 198;
+    const pesoRaw = pPos < u8.length ? u8[pPos++] : 95;
+    const altura = alturaRaw >= 150 && alturaRaw <= 240 ? alturaRaw : 198;
+    const peso = pesoRaw >= 50 && pesoRaw <= 170 ? pesoRaw : 95;
 
     // Procedencia skip
-    reader.skip(1);
-    reader.readDinamicField();
-    reader.readDinamicField();
-    reader.skip(149); // dump string
+    pPos += 1;
+    for (let s = 0; s < 2; s++) {
+      if (pPos + 2 <= u8.length) {
+        const slen = u8[pPos] | (u8[pPos + 1] << 8);
+        pPos += 2;
+        if (slen > 0 && slen < 100) {
+          pPos += slen;
+        }
+      }
+    }
 
-    const medias: Medias = {
-      velocidad: reader.readByte(),
-      resistencia: reader.readByte(),
-      agresividad: reader.readByte(),
-      salto: reader.readByte(),
-      oculto: reader.readByte(),
-      defensa: reader.readByte(),
-      tiro2: reader.readByte(),
-      tiro3: reader.readByte(),
-      tiroL: reader.readByte(),
-      rebotes: reader.readByte(),
-      asistencias: reader.readByte(),
+    // Extract 11 Medias
+    let foundMedias: Medias | null = null;
+    const testStandardDumpOffset = pPos + 149;
+    if (testStandardDumpOffset + 11 <= nextOffset) {
+      const b = u8.subarray(testStandardDumpOffset, testStandardDumpOffset + 11);
+      const allValid = Array.from(b).every((val) => val >= 10 && val <= 99);
+      if (allValid) {
+        foundMedias = {
+          velocidad: b[0],
+          resistencia: b[1],
+          agresividad: b[2],
+          salto: b[3],
+          oculto: b[4],
+          defensa: b[5],
+          tiro2: b[6],
+          tiro3: b[7],
+          tiroL: b[8],
+          rebotes: b[9],
+          asistencias: b[10],
+        };
+      }
+    }
+
+    if (!foundMedias) {
+      const searchEnd = Math.min(nextOffset, pPos + 200);
+      for (let s = searchEnd - 11; s >= pPos + 20; s--) {
+        const b = u8.subarray(s, s + 11);
+        const allValid = Array.from(b).every((val) => val >= 10 && val <= 99);
+        if (allValid) {
+          foundMedias = {
+            velocidad: b[0],
+            resistencia: b[1],
+            agresividad: b[2],
+            salto: b[3],
+            oculto: b[4],
+            defensa: b[5],
+            tiro2: b[6],
+            tiro3: b[7],
+            tiroL: b[8],
+            rebotes: b[9],
+            asistencias: b[10],
+          };
+          break;
+        }
+      }
+    }
+
+    const medias: Medias = foundMedias || {
+      velocidad: demarcacion === 0 ? 80 : 70,
+      resistencia: 75,
+      agresividad: 70,
+      salto: demarcacion >= 3 ? 80 : 72,
+      oculto: 75,
+      defensa: 72,
+      tiro2: 74,
+      tiro3: demarcacion <= 2 ? 76 : 50,
+      tiroL: 75,
+      rebotes: demarcacion >= 3 ? 82 : 62,
+      asistencias: demarcacion === 0 ? 84 : 65,
     };
 
     plantilla.push({
-      jugadorId: punteroJug,
-      puntero: punteroJug,
-      dorsal,
-      nombreCorto: jNombreCorto,
-      nombreLargo: jNombreLargo,
+      jugadorId: cand.puntero || plantilla.length + 1,
+      puntero: cand.puntero || plantilla.length + 1,
+      dorsal: cand.dorsal || plantilla.length + 4,
+      nombreCorto: cand.nombreCorto || `JUGADOR ${plantilla.length + 1}`,
+      nombreLargo: cand.nombreLargo || cand.nombreCorto || `Jugador ${plantilla.length + 1}`,
       nacionalidad: jPais || 22,
-      demarcacion: demarcacion >= 0 && demarcacion <= 4 ? demarcacion : 2,
-      anoNacimiento: anoNac > 1900 && anoNac < 2050 ? anoNac : currentYear - 24,
+      demarcacion,
+      anoNacimiento: anoNac,
       colorPiel,
-      altura: altura || 195,
-      peso: peso || 90,
+      altura,
+      peso,
       medias,
-      equipoPuntero: defaultPuntero,
+      equipoPuntero: detectedPuntero,
     });
   }
 
   return {
-    equipoId: defaultPuntero,
-    puntero: defaultPuntero,
-    nombreCorto: nombreCorto || "EQUIPO",
-    nombreLargo: nombreLargo || "EQUIPO DE BALONCESTO",
-    pabellon: pabellon || "Pabellón Municipal",
+    equipoId: detectedPuntero,
+    puntero: detectedPuntero,
+    nombreCorto: nombreCorto || `EQ ${detectedPuntero}`,
+    nombreLargo: nombreLargo || nombreCorto || `EQUIPO ${detectedPuntero}`,
+    pabellon: pabellon || 'Pabellón Municipal',
     aforo: aforo > 0 ? aforo : 3500,
     presupuesto: presupuesto > 0 ? presupuesto : 500,
-    entrenador: entrenador || "Entrenador",
+    entrenador: entrenador || 'Entrenador',
     pais: bytePais || 22,
     plantilla,
   };

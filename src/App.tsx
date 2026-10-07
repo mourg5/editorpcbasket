@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { MainMenuView } from './components/MainMenuView';
 import { TeamsView } from './components/TeamsView';
 import { PlayersDirectoryView } from './components/PlayersDirectoryView';
+import { StatsDashboardView } from './components/StatsDashboardView';
 import { ManagerView } from './components/ManagerView';
 import { SettingsView } from './components/SettingsView';
 import { TeamEditorModal } from './components/TeamEditorModal';
@@ -110,6 +111,72 @@ export const App: React.FC = () => {
     setTeams(empty);
   };
 
+  const handleBatchMovePlayers = (
+    playerPunteros: number[],
+    targetTeamPuntero: number
+  ) => {
+    setTeams((prevTeams) => {
+      const targetTeam = prevTeams.find((t) => t.puntero === targetTeamPuntero);
+      if (!targetTeam) return prevTeams;
+
+      const playersToMove: Jugador[] = [];
+      const updatedTeams = prevTeams.map((team) => {
+        if (team.puntero === targetTeamPuntero) return team;
+        const remaining = team.plantilla.filter((p) => {
+          if (playerPunteros.includes(p.puntero)) {
+            playersToMove.push({ ...p, equipoPuntero: targetTeamPuntero });
+            return false;
+          }
+          return true;
+        });
+        return { ...team, plantilla: remaining };
+      });
+
+      // Target team used dorsals
+      const usedDorsals = new Set(
+        updatedTeams
+          .find((t) => t.puntero === targetTeamPuntero)!
+          .plantilla.map((p) => p.dorsal)
+      );
+
+      const adjustedPlayersToMove = playersToMove.map((player) => {
+        let dorsal = player.dorsal;
+        if (usedDorsals.has(dorsal)) {
+          for (let d = 4; d <= 99; d++) {
+            if (!usedDorsals.has(d)) {
+              dorsal = d;
+              break;
+            }
+          }
+        }
+        usedDorsals.add(dorsal);
+        return { ...player, dorsal, equipoPuntero: targetTeamPuntero };
+      });
+
+      const finalTeams = updatedTeams.map((team) => {
+        if (team.puntero === targetTeamPuntero) {
+          return {
+            ...team,
+            plantilla: [...team.plantilla, ...adjustedPlayersToMove],
+          };
+        }
+        return team;
+      });
+
+      StorageService.saveTeams(finalTeams);
+
+      // Keep editingTeam in sync if open
+      if (editingTeam) {
+        const refreshed = finalTeams.find((t) => t.puntero === editingTeam.puntero);
+        if (refreshed) {
+          setEditingTeam(refreshed);
+        }
+      }
+
+      return finalTeams;
+    });
+  };
+
   const totalPlayers = teams.reduce(
     (acc, t) => acc + (t.plantilla?.length || 0),
     0
@@ -170,6 +237,24 @@ export const App: React.FC = () => {
               setEditingTeam(team);
               navigateTo('TeamsView');
             }}
+            onBatchMovePlayers={handleBatchMovePlayers}
+            startingYear={settings.startingYear}
+            useCotNationality={settings.useCotNationality}
+            useEurNationality={settings.useEurNationality}
+          />
+        )}
+
+        {currentView === 'StatsDashboardView' && (
+          <StatsDashboardView
+            teams={teams}
+            onSelectTeam={(team) => {
+              setEditingTeam(team);
+            }}
+            onEditPlayer={(player, onSaveCallback) =>
+              setEditingPlayer({ player, onSaveCallback })
+            }
+            onNavigate={navigateTo}
+            startingYear={settings.startingYear}
           />
         )}
 
@@ -202,6 +287,7 @@ export const App: React.FC = () => {
           team={editingTeam}
           onSave={handleSaveTeam}
           onClose={() => setEditingTeam(null)}
+          onDelete={handleDeleteTeam}
           onEditPlayer={(player, onPlayerSave) => {
             setEditingPlayer({
               player,

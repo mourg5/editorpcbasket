@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, Shield, Users, Terminal, Database, Sparkles, FolderSync, Info } from 'lucide-react';
+import { Settings, Shield, Users, Terminal, Database, Sparkles, FolderSync, Info, BarChart3 } from 'lucide-react';
 import { NavigationView, Equipo } from '../types/pcbasket';
 import { calculateTeamMedias } from '../utils/ratingsUtils';
 
@@ -51,6 +51,15 @@ export const MainMenuView: React.FC<MainMenuViewProps> = ({
       icon: Users,
       accentColor: 'from-emerald-500/20 to-emerald-600/10 border-emerald-500/30 text-emerald-400 group-hover:border-emerald-400',
       badge: `${totalPlayers} Jugadores`,
+    },
+    {
+      id: 'StatsDashboardView' as NavigationView,
+      title: 'Estadísticas & Balance',
+      subtitle: 'Distribución y Métricas',
+      desc: 'Histogramas de atributos, rankings comparativos por equipo y detección de anomalías.',
+      icon: BarChart3,
+      accentColor: 'from-yellow-500/20 to-amber-600/10 border-amber-400/40 text-[#ffce42] group-hover:border-[#ffce42]',
+      badge: 'Analítica',
     },
     {
       id: 'ManagerView' as NavigationView,
@@ -119,8 +128,8 @@ export const MainMenuView: React.FC<MainMenuViewProps> = ({
         </div>
       </div>
 
-      {/* 4 Main Action Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* 5 Main Action Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
         {menuItems.map((item) => {
           const Icon = item.icon;
           return (

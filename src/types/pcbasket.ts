@@ -29,6 +29,7 @@ export interface Jugador {
   peso: number; // in kg
   medias: Medias;
   equipoPuntero?: number;
+  contrato?: number; // Salario/Ficha anual en Millones de pesetas (M)
 }
 
 export interface Equipo {
@@ -82,4 +83,10 @@ export interface Settings {
   startingYear: number;
 }
 
-export type NavigationView = 'MainMenuView' | 'TeamsView' | 'PlayersView' | 'ManagerView' | 'SettingsView';
+export type NavigationView =
+  | 'MainMenuView'
+  | 'TeamsView'
+  | 'PlayersView'
+  | 'StatsDashboardView'
+  | 'ManagerView'
+  | 'SettingsView';
