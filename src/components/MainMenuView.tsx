@@ -63,12 +63,12 @@ export const MainMenuView: React.FC<MainMenuViewProps> = ({
     },
     {
       id: 'ManagerView' as NavigationView,
-      title: 'MANAGER.EXE',
-      subtitle: 'Parches y Competiciones',
-      desc: 'Cambio de temporada inicial, eliminación del Efecto 2000 y edición de Euroliga/Eurocup.',
+      title: 'Manager & Traspasos',
+      subtitle: 'Historial y Parches EXE',
+      desc: 'Libro oficial de traspasos con marcas de tiempo, reversión de movimientos y herramientas binarias para MANAGER.EXE.',
       icon: Terminal,
       accentColor: 'from-purple-500/20 to-purple-600/10 border-purple-500/30 text-purple-400 group-hover:border-purple-400',
-      badge: 'Parches',
+      badge: 'Traspasos & EXE',
     },
   ];
 

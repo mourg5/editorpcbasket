@@ -29,3 +29,18 @@ Migrado a React + Vite + TypeScript para AI Studio Build, preservando la lógica
 
 - **Codificación Dinamic Multimedia**:
   - Implementación en TypeScript de la tabla de codificación por sustitución de caracteres propia de Dinamic Multimedia (`DinamicEncoding`).
+
+## Versión Descargable Offline & Releases en GitHub
+
+El repositorio cuenta con un flujo automatizado de integración continua con GitHub Actions (`.github/workflows/release.yml`):
+
+1. **Generación Automática en Release / Tags**:
+   - Cada vez que se crea un tag (ej. `v1.0.0`) o se publica una **Release** en GitHub, se compila la versión autónoma.
+   - Se empaqueta en un archivo descargable: `Editor-PC-Basket-Offline-v*.zip`.
+
+2. **Uso 100% Local y Sin Internet**:
+   - Descomprime el archivo descargado.
+   - Haz doble clic en `Abrir-Editor-PC-Basket.bat` (Windows), `Abrir-Editor-PC-Basket.sh` (Linux), o abre directamente `index.html` en cualquier navegador web moderno.
+   - No requiere servidor web, conexión a internet ni dependencias instaladas en el sistema.
+   - Soporta importación, edición y exportación de ficheros `.DBC` y `.ZIP` totalmente en local.
+

@@ -11,6 +11,7 @@ import { PlayerEditorModal } from './components/PlayerEditorModal';
 import { ProballersImportModal } from './components/ProballersImportModal';
 import { StorageService } from './services/storageService';
 import { Equipo, Jugador, Settings, NavigationView } from './types/pcbasket';
+import { calculateMediaQuinteto } from './utils/ratingsUtils';
 
 export const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<NavigationView>('MainMenuView');
@@ -119,12 +120,15 @@ export const App: React.FC = () => {
       const targetTeam = prevTeams.find((t) => t.puntero === targetTeamPuntero);
       if (!targetTeam) return prevTeams;
 
-      const playersToMove: Jugador[] = [];
+      const playersToMoveWithSource: { player: Jugador; fromTeam: Equipo }[] = [];
       const updatedTeams = prevTeams.map((team) => {
         if (team.puntero === targetTeamPuntero) return team;
         const remaining = team.plantilla.filter((p) => {
           if (playerPunteros.includes(p.puntero)) {
-            playersToMove.push({ ...p, equipoPuntero: targetTeamPuntero });
+            playersToMoveWithSource.push({
+              player: { ...p, equipoPuntero: targetTeamPuntero },
+              fromTeam: team,
+            });
             return false;
           }
           return true;
@@ -139,7 +143,7 @@ export const App: React.FC = () => {
           .plantilla.map((p) => p.dorsal)
       );
 
-      const adjustedPlayersToMove = playersToMove.map((player) => {
+      const adjustedPlayersToMove = playersToMoveWithSource.map(({ player }) => {
         let dorsal = player.dorsal;
         if (usedDorsals.has(dorsal)) {
           for (let d = 4; d <= 99; d++) {
@@ -164,6 +168,25 @@ export const App: React.FC = () => {
       });
 
       StorageService.saveTeams(finalTeams);
+
+      // Record in Transfer Ledger
+      const transferRecords = playersToMoveWithSource.map(({ player, fromTeam }) => ({
+        playerPuntero: player.puntero,
+        playerName: player.nombreLargo || player.nombreCorto,
+        playerDorsal: player.dorsal,
+        playerDemarcacion: player.demarcacion,
+        playerMedia: calculateMediaQuinteto(player.medias),
+        fromTeamPuntero: fromTeam.puntero,
+        fromTeamName: fromTeam.nombreCorto,
+        toTeamPuntero: targetTeam.puntero,
+        toTeamName: targetTeam.nombreCorto,
+        type: 'TRANSFER' as const,
+        notes: `Traspaso a ${targetTeam.nombreCorto}`,
+      }));
+
+      if (transferRecords.length > 0) {
+        StorageService.recordTransfers(transferRecords);
+      }
 
       // Keep editingTeam in sync if open
       if (editingTeam) {
@@ -266,6 +289,8 @@ export const App: React.FC = () => {
               const updated = { ...settings, startingYear: year };
               handleSaveSettings(updated);
             }}
+            onBatchMovePlayers={handleBatchMovePlayers}
+            onRefreshTeams={() => setTeams(StorageService.getTeams())}
           />
         )}
 

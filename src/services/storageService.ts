@@ -1,7 +1,8 @@
-import { Equipo, Jugador, Settings, Demarcacion } from '../types/pcbasket';
+import { Equipo, Jugador, Settings, Demarcacion, TransferRecord } from '../types/pcbasket';
 
 const SETTINGS_KEY = 'epcb_settings';
 const TEAMS_KEY = 'epcb_teams';
+const TRANSFER_LEDGER_KEY = 'epcb_transfer_ledger';
 
 export const DEFAULT_SETTINGS: Settings = {
   path: 'C:\\DINAMIC\\PCBASKET6',
@@ -336,5 +337,120 @@ export class StorageService {
       }
     }
     return players;
+  }
+
+  // --- TRANSFER LEDGER METHODS ---
+
+  static getTransferLedger(): TransferRecord[] {
+    try {
+      const stored = localStorage.getItem(TRANSFER_LEDGER_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.error('Error reading transfer ledger:', e);
+    }
+
+    // Seed default historical records if empty
+    const seeded = this.getInitialTransfers();
+    this.saveTransferLedger(seeded);
+    return seeded;
+  }
+
+  static getInitialTransfers(): TransferRecord[] {
+    const now = Date.now();
+    return [
+      {
+        id: 'tr-seed-1',
+        timestamp: now - 1000 * 60 * 18, // 18 mins ago
+        playerPuntero: 1001,
+        playerName: 'Alberto HERREROS',
+        playerDorsal: 11,
+        playerDemarcacion: 2,
+        playerMedia: 92,
+        fromTeamPuntero: 104,
+        fromTeamName: 'ESTUDIANTES',
+        toTeamPuntero: 101,
+        toTeamName: 'REAL MADRID',
+        type: 'TRANSFER',
+        notes: 'Fichaje estrella ACB - Traspaso cerrado',
+      },
+      {
+        id: 'tr-seed-2',
+        timestamp: now - 1000 * 60 * 60 * 4, // 4 hours ago
+        playerPuntero: 1002,
+        playerName: 'Aleksandar DJORDJEVIC',
+        playerDorsal: 10,
+        playerDemarcacion: 0,
+        playerMedia: 96,
+        fromTeamPuntero: 201,
+        fromTeamName: 'OLIMPIA MILANO',
+        toTeamPuntero: 102,
+        toTeamName: 'FC BARCELONA',
+        type: 'TRANSFER',
+        notes: 'Incorporación internacional director de juego',
+      },
+      {
+        id: 'tr-seed-3',
+        timestamp: now - 1000 * 60 * 60 * 26, // 26 hours ago
+        playerPuntero: 1005,
+        playerName: 'Eric STRUELENS',
+        playerDorsal: 12,
+        playerDemarcacion: 4,
+        playerMedia: 88,
+        fromTeamPuntero: 205,
+        fromTeamName: 'SPIROU CHARLEROI',
+        toTeamPuntero: 101,
+        toTeamName: 'REAL MADRID',
+        type: 'TRANSFER',
+        notes: 'Pívot comunitario - Refuerzo juego interior',
+      },
+    ];
+  }
+
+  static saveTransferLedger(records: TransferRecord[]): void {
+    try {
+      localStorage.setItem(TRANSFER_LEDGER_KEY, JSON.stringify(records));
+    } catch (e) {
+      console.error('Error saving transfer ledger:', e);
+    }
+  }
+
+  static recordTransfers(
+    records: (Omit<TransferRecord, 'id' | 'timestamp'> & {
+      id?: string;
+      timestamp?: number;
+    })[]
+  ): TransferRecord[] {
+    const existing = this.getTransferLedger();
+    const newRecords: TransferRecord[] = records.map((r, i) => ({
+      ...r,
+      id: r.id || `tr-${Date.now()}-${Math.random().toString(36).substring(2, 7)}-${i}`,
+      timestamp: r.timestamp || Date.now() + i, // Preserve order
+    }));
+
+    // Prepend new records to the top
+    const combined = [...newRecords, ...existing];
+    this.saveTransferLedger(combined);
+    return combined;
+  }
+
+  static deleteTransferRecord(id: string): TransferRecord[] {
+    const existing = this.getTransferLedger().filter((r) => r.id !== id);
+    this.saveTransferLedger(existing);
+    return existing;
+  }
+
+  static clearTransferLedger(): void {
+    this.saveTransferLedger([]);
+  }
+
+  static resetTransferLedger(): TransferRecord[] {
+    const initial = this.getInitialTransfers();
+    this.saveTransferLedger(initial);
+    return initial;
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Terminal,
   Calendar,
@@ -11,6 +11,8 @@ import {
   AlertTriangle,
   Play,
   RotateCcw,
+  History,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { Equipo } from '../types/pcbasket';
 import {
@@ -20,18 +22,30 @@ import {
   YEAR_OFFSETS,
   NEXT_YEAR_OFFSETS,
 } from '../utils/managerUtils';
+import { TransferLedger } from './TransferLedger';
+import { StorageService } from '../services/storageService';
 
 interface ManagerViewProps {
   teams: Equipo[];
   startingYear: number;
   onUpdateStartingYear: (year: number) => void;
+  onBatchMovePlayers?: (playerPunteros: number[], targetTeamPuntero: number) => void;
+  onRefreshTeams?: () => void;
+  initialTab?: 'LEDGER' | 'EXE_TOOLS';
 }
 
 export const ManagerView: React.FC<ManagerViewProps> = ({
   teams,
   startingYear,
   onUpdateStartingYear,
+  onBatchMovePlayers,
+  onRefreshTeams,
+  initialTab = 'LEDGER',
 }) => {
+  const [activeTab, setActiveTab] = useState<'LEDGER' | 'EXE_TOOLS'>(initialTab);
+  const [transferCount, setTransferCount] = useState<number>(() => {
+    return StorageService.getTransferLedger().length;
+  });
   const [targetYear, setTargetYear] = useState<number>(startingYear || 1997);
   const [removeAgeLimit, setRemoveAgeLimit] = useState<boolean>(true);
   const [uploadedExeBuffer, setUploadedExeBuffer] = useState<Uint8Array | null>(null);
@@ -45,6 +59,10 @@ export const ManagerView: React.FC<ManagerViewProps> = ({
     103, 106, 107, 108, 301, 302, 303, 304, 305, 306, 307, 308,
   ]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setTransferCount(StorageService.getTransferLedger().length);
+  }, [activeTab]);
 
   const handleExeUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -111,7 +129,7 @@ export const ManagerView: React.FC<ManagerViewProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
       {/* Hidden file input */}
       <input
         type="file"
@@ -121,207 +139,248 @@ export const ManagerView: React.FC<ManagerViewProps> = ({
         className="hidden"
       />
 
-      {/* Header Banner */}
-      <div className="bg-slate-900/90 border border-purple-500/30 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center space-x-4">
-            <div className="w-14 h-14 bg-purple-600/20 text-purple-400 border border-purple-500/40 rounded-xl flex items-center justify-center shadow-inner">
-              <Terminal className="w-8 h-8" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs uppercase tracking-widest text-purple-400 font-bold">
-                  Ejecutable Dinamic Multimedia
-                </span>
-                <span className="bg-purple-500/20 text-purple-300 text-[10px] font-mono px-2 py-0.5 rounded">
-                  MANAGER.EXE
-                </span>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-wide">
-                Herramientas y Parches del Ejecutable
-              </h2>
-            </div>
-          </div>
-
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold tracking-wide flex items-center gap-2 transition-all shadow-lg"
-          >
-            <Upload className="w-4 h-4" />
-            {uploadedExeBuffer ? 'Cambiar MANAGER.EXE' : 'Cargar MANAGER.EXE'}
-          </button>
-        </div>
-      </div>
-
-      {/* 2 Primary Tools Grid matching ManagerView.xaml */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Tool 1: Starting Season */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
-          <div className="flex items-center space-x-3 text-[#ffce42]">
-            <Calendar className="w-6 h-6" />
-            <h3 className="text-base font-bold text-white">
-              Temporada de Inicio
-            </h3>
-          </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            Modifica la temporada de arranque en <strong className="text-slate-200">18 offsets</strong>{' '}
-            para el año actual y <strong className="text-slate-200">41 offsets</strong> para el año
-            siguiente dentro del archivo binario.
-          </p>
-
-          <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-300">
-                Año Inicial (Temporada):
-              </span>
-              <span className="text-sm font-black text-amber-400 font-mono">
-                {targetYear} / {targetYear + 1}
-              </span>
-            </div>
-            <input
-              type="range"
-              min={1990}
-              max={2035}
-              value={targetYear}
-              onChange={(e) => setTargetYear(parseInt(e.target.value))}
-              className="w-full accent-[#ffce42] cursor-pointer"
-            />
-            <div className="flex justify-between text-[10px] text-slate-500 font-mono">
-              <span>1990</span>
-              <span>1997 (Original)</span>
-              <span>2000</span>
-              <span>2025</span>
-              <span>2035</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Tool 2: Efecto 2000 Age Restriction */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
-          <div className="flex items-center space-x-3 text-emerald-400">
-            <ShieldAlert className="w-6 h-6" />
-            <h3 className="text-base font-bold text-white">
-              Eliminar 'Efecto 2000'
-            </h3>
-          </div>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            Elimina el límite que impedía fichar o mantener jugadores nacidos a partir del año 2000
-            o que excedían el rango de edad original de Dinamic Multimedia (parchea 0x0014A391 y
-            0x0014A399).
-          </p>
-
-          <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 flex items-center justify-between">
-            <div className="space-y-0.5">
-              <span className="text-xs font-bold text-white block">
-                Retirar restricción de edad
-              </span>
-              <span className="text-[11px] text-slate-400">
-                Permite jugar en temporadas modernas con jugadores jóvenes
-              </span>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={removeAgeLimit}
-                onChange={(e) => setRemoveAgeLimit(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all peer-checked:bg-emerald-500"></div>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      {/* European Tournaments Editor */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
-        <div className="flex items-center space-x-3 text-blue-400">
-          <Trophy className="w-6 h-6" />
-          <h3 className="text-base font-bold text-white">
-            Competiciones Europeas (Offsets de Equipos)
-          </h3>
-        </div>
-        <p className="text-xs text-slate-400">
-          Equipos clasificados en MANAGER.EXE para la Euroliga (offset 0x002397A8) y Eurocup (offset
-          0x002394D8).
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-            <h4 className="text-xs font-bold text-[#ffce42] uppercase tracking-wide">
-              Euroliga (24 Equipos)
-            </h4>
-            <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1">
-              {euroligaPointers.map((p, idx) => {
-                const team = teams.find((t) => t.puntero === p);
-                return (
-                  <span
-                    key={idx}
-                    className="inline-block px-2 py-0.5 rounded text-[11px] font-mono bg-slate-800 border border-slate-700 text-slate-200"
-                  >
-                    {team ? team.nombreCorto : `ID ${p}`}
-                  </span>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
-            <h4 className="text-xs font-bold text-blue-400 uppercase tracking-wide">
-              Eurocup (48 Equipos)
-            </h4>
-            <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1">
-              {eurocupPointers.map((p, idx) => {
-                const team = teams.find((t) => t.puntero === p);
-                return (
-                  <span
-                    key={idx}
-                    className="inline-block px-2 py-0.5 rounded text-[11px] font-mono bg-slate-800 border border-slate-700 text-slate-200"
-                  >
-                    {team ? team.nombreCorto : `ID ${p}`}
-                  </span>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Patch Application and Download Action Box */}
-      <div className="bg-gradient-to-r from-purple-900/40 via-slate-900 to-slate-900 border-2 border-purple-500/50 rounded-2xl p-6 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div>
-          <h3 className="text-base font-bold text-white mb-1">
-            {uploadedExeBuffer
-              ? `Archivo listo: ${fileName}`
-              : 'Generador de Parche para MANAGER.EXE'}
-          </h3>
-          <p className="text-xs text-slate-400 max-w-xl">
-            {uploadedExeBuffer
-              ? 'Aplica los cambios directamente sobre el archivo binario cargado y descárgalo con los parches inyectados.'
-              : 'Si no tienes el archivo a mano, puedes generar y descargar un ejecutable preparado con los parches de temporada y Efecto 2000.'}
-          </p>
-        </div>
+      {/* Manager Navigation Tabs */}
+      <div className="flex items-center border-b border-slate-800 gap-2 pb-0">
+        <button
+          onClick={() => setActiveTab('LEDGER')}
+          className={`flex items-center gap-2.5 px-6 py-3.5 font-bold text-xs uppercase tracking-wider rounded-t-xl transition-all border-t-2 border-x ${
+            activeTab === 'LEDGER'
+              ? 'bg-slate-900 text-[#ffce42] border-[#ffce42] border-b-slate-900 shadow-xl'
+              : 'bg-slate-950/40 text-slate-400 border-transparent hover:text-slate-200 hover:bg-slate-900/60'
+          }`}
+        >
+          <History className="w-4 h-4 text-[#ffce42]" />
+          <span>Libro de Traspasos (Transfer Ledger)</span>
+          <span className="bg-amber-500/20 text-amber-300 text-[10px] font-mono px-2 py-0.5 rounded-full border border-amber-500/30">
+            {transferCount}
+          </span>
+        </button>
 
         <button
-          onClick={handleApplyPatchesAndDownload}
-          className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-extrabold rounded-xl text-xs uppercase tracking-wider flex items-center gap-2 shadow-xl transition-all shrink-0"
+          onClick={() => setActiveTab('EXE_TOOLS')}
+          className={`flex items-center gap-2.5 px-6 py-3.5 font-bold text-xs uppercase tracking-wider rounded-t-xl transition-all border-t-2 border-x ${
+            activeTab === 'EXE_TOOLS'
+              ? 'bg-slate-900 text-purple-400 border-purple-500 border-b-slate-900 shadow-xl'
+              : 'bg-slate-950/40 text-slate-400 border-transparent hover:text-slate-200 hover:bg-slate-900/60'
+          }`}
         >
-          <Download className="w-5 h-5" />
-          Aplicar y Descargar Ejecutable
+          <Terminal className="w-4 h-4 text-purple-400" />
+          <span>Parches del Ejecutable (MANAGER.EXE)</span>
         </button>
       </div>
 
-      {/* Log Output Box */}
-      {patchLogs.length > 0 && (
-        <div className="bg-black/80 border border-slate-800 rounded-xl p-4 font-mono text-xs text-emerald-400 space-y-1">
-          <div className="text-slate-400 font-bold mb-2 flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-emerald-400" /> Registro de Parches:
-          </div>
-          {patchLogs.map((log, i) => (
-            <div key={i} className="text-slate-300">
-              &gt; {log}
+      {/* Tab 1: Transfer Ledger */}
+      {activeTab === 'LEDGER' && (
+        <TransferLedger
+          teams={teams}
+          onBatchMovePlayers={onBatchMovePlayers}
+          onRefreshTeams={onRefreshTeams}
+        />
+      )}
+
+      {/* Tab 2: Binary Exe Patcher Tools */}
+      {activeTab === 'EXE_TOOLS' && (
+        <div className="space-y-8 animate-in fade-in duration-150">
+          {/* Header Banner */}
+          <div className="bg-slate-900/90 border border-purple-500/30 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center space-x-4">
+                <div className="w-14 h-14 bg-purple-600/20 text-purple-400 border border-purple-500/40 rounded-xl flex items-center justify-center shadow-inner">
+                  <Terminal className="w-8 h-8" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs uppercase tracking-widest text-purple-400 font-bold">
+                      Ejecutable Dinamic Multimedia
+                    </span>
+                    <span className="bg-purple-500/20 text-purple-300 text-[10px] font-mono px-2 py-0.5 rounded">
+                      MANAGER.EXE
+                    </span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-black text-white tracking-wide">
+                    Herramientas y Parches del Ejecutable
+                  </h2>
+                </div>
+              </div>
+
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-bold tracking-wide flex items-center gap-2 transition-all shadow-lg"
+              >
+                <Upload className="w-4 h-4" />
+                {uploadedExeBuffer ? 'Cambiar MANAGER.EXE' : 'Cargar MANAGER.EXE'}
+              </button>
             </div>
-          ))}
+          </div>
+
+          {/* 2 Primary Tools Grid matching ManagerView.xaml */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Tool 1: Starting Season */}
+            <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
+              <div className="flex items-center space-x-3 text-[#ffce42]">
+                <Calendar className="w-6 h-6" />
+                <h3 className="text-base font-bold text-white">Temporada de Inicio</h3>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Modifica la temporada de arranque en{' '}
+                <strong className="text-slate-200">18 offsets</strong> para el año actual y{' '}
+                <strong className="text-slate-200">41 offsets</strong> para el año siguiente dentro del
+                archivo binario.
+              </p>
+
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-300">
+                    Año Inicial (Temporada):
+                  </span>
+                  <span className="text-sm font-black text-amber-400 font-mono">
+                    {targetYear} / {targetYear + 1}
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={1990}
+                  max={2035}
+                  value={targetYear}
+                  onChange={(e) => setTargetYear(parseInt(e.target.value))}
+                  className="w-full accent-[#ffce42] cursor-pointer"
+                />
+                <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                  <span>1990</span>
+                  <span>1997 (Original)</span>
+                  <span>2000</span>
+                  <span>2025</span>
+                  <span>2035</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Tool 2: Efecto 2000 Age Restriction */}
+            <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
+              <div className="flex items-center space-x-3 text-emerald-400">
+                <ShieldAlert className="w-6 h-6" />
+                <h3 className="text-base font-bold text-white">Eliminar 'Efecto 2000'</h3>
+              </div>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Elimina el límite que impedía fichar o mantener jugadores nacidos a partir del año
+                2000 o que excedían el rango de edad original de Dinamic Multimedia (parchea
+                0x0014A391 y 0x0014A399).
+              </p>
+
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <span className="text-xs font-bold text-white block">
+                    Retirar restricción de edad
+                  </span>
+                  <span className="text-[11px] text-slate-400">
+                    Permite jugar en temporadas modernas con jugadores jóvenes
+                  </span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={removeAgeLimit}
+                    onChange={(e) => setRemoveAgeLimit(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* European Tournaments Editor */}
+          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl">
+            <div className="flex items-center space-x-3 text-blue-400">
+              <Trophy className="w-6 h-6" />
+              <h3 className="text-base font-bold text-white">
+                Competiciones Europeas (Offsets de Equipos)
+              </h3>
+            </div>
+            <p className="text-xs text-slate-400">
+              Equipos clasificados en MANAGER.EXE para la Euroliga (offset 0x002397A8) y Eurocup (offset
+              0x002394D8).
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                <h4 className="text-xs font-bold text-[#ffce42] uppercase tracking-wide">
+                  Euroliga (24 Equipos)
+                </h4>
+                <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1">
+                  {euroligaPointers.map((p, idx) => {
+                    const team = teams.find((t) => t.puntero === p);
+                    return (
+                      <span
+                        key={idx}
+                        className="inline-block px-2 py-0.5 rounded text-[11px] font-mono bg-slate-800 border border-slate-700 text-slate-200"
+                      >
+                        {team ? team.nombreCorto : `ID ${p}`}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                <h4 className="text-xs font-bold text-blue-400 uppercase tracking-wide">
+                  Eurocup (48 Equipos)
+                </h4>
+                <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1">
+                  {eurocupPointers.map((p, idx) => {
+                    const team = teams.find((t) => t.puntero === p);
+                    return (
+                      <span
+                        key={idx}
+                        className="inline-block px-2 py-0.5 rounded text-[11px] font-mono bg-slate-800 border border-slate-700 text-slate-200"
+                      >
+                        {team ? team.nombreCorto : `ID ${p}`}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Patch Application and Download Action Box */}
+          <div className="bg-gradient-to-r from-purple-900/40 via-slate-900 to-slate-900 border-2 border-purple-500/50 rounded-2xl p-6 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div>
+              <h3 className="text-base font-bold text-white mb-1">
+                {uploadedExeBuffer
+                  ? `Archivo listo: ${fileName}`
+                  : 'Generador de Parche para MANAGER.EXE'}
+              </h3>
+              <p className="text-xs text-slate-400 max-w-xl">
+                {uploadedExeBuffer
+                  ? 'Aplica los cambios directamente sobre el archivo binario cargado y descárgalo con los parches inyectados.'
+                  : 'Si no tienes el archivo a mano, puedes generar y descargar un ejecutable preparado con los parches de temporada y Efecto 2000.'}
+              </p>
+            </div>
+
+            <button
+              onClick={handleApplyPatchesAndDownload}
+              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-extrabold rounded-xl text-xs uppercase tracking-wider flex items-center gap-2 shadow-xl transition-all shrink-0"
+            >
+              <Download className="w-5 h-5" />
+              Aplicar y Descargar Ejecutable
+            </button>
+          </div>
+
+          {/* Log Output Box */}
+          {patchLogs.length > 0 && (
+            <div className="bg-black/80 border border-slate-800 rounded-xl p-4 font-mono text-xs text-emerald-400 space-y-1">
+              <div className="text-slate-400 font-bold mb-2 flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-400" /> Registro de Parches:
+              </div>
+              {patchLogs.map((log, i) => (
+                <div key={i} className="text-slate-300">
+                  &gt; {log}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

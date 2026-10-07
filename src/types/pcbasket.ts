@@ -83,6 +83,23 @@ export interface Settings {
   startingYear: number;
 }
 
+export interface TransferRecord {
+  id: string;
+  timestamp: number; // Epoch time in ms
+  playerPuntero: number;
+  playerName: string;
+  playerDorsal: number;
+  playerDemarcacion: Demarcacion;
+  playerMedia?: number;
+  fromTeamPuntero: number;
+  fromTeamName: string;
+  toTeamPuntero: number;
+  toTeamName: string;
+  type?: 'TRANSFER' | 'RELEASE' | 'SIGNING' | 'SWAP';
+  batchId?: string;
+  notes?: string;
+}
+
 export type NavigationView =
   | 'MainMenuView'
   | 'TeamsView'

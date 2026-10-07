@@ -18,7 +18,7 @@ const VIEW_TITLES: Record<NavigationView, string> = {
   TeamsView: 'Gestión de Equipos',
   PlayersView: 'Buscador de Jugadores',
   StatsDashboardView: 'Análisis y Estadísticas de Liga',
-  ManagerView: 'Herramientas MANAGER.EXE',
+  ManagerView: 'Manager & Libro de Traspasos',
   SettingsView: 'Ajustes y Configuración',
 };
 

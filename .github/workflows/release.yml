@@ -1,0 +1,138 @@
+name: Release Portable Standalone
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web application
+        run: npm run build
+
+      - name: Bundle Portable Standalone App (Offline & Local)
+        run: |
+          mkdir -p package-portable/Editor-PC-Basket-Offline
+          
+          # Copy production build
+          cp -r dist/* package-portable/Editor-PC-Basket-Offline/
+
+          # Create Windows double-click launcher
+          cat << 'EOF' > package-portable/Editor-PC-Basket-Offline/Abrir-Editor-PC-Basket.bat
+          @echo off
+          title Editor PC Basket - Modo Offline
+          echo ===================================================
+          echo   Abriendo Editor PC Basket en tu navegador local...
+          echo   (No requiere conexion a Internet)
+          echo ===================================================
+          start "" "%~dp0index.html"
+          exit
+          EOF
+
+          # Create Linux launcher
+          cat << 'EOF' > package-portable/Editor-PC-Basket-Offline/Abrir-Editor-PC-Basket.sh
+          #!/usr/bin/env bash
+          DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+          if which xdg-open > /dev/null; then
+            xdg-open "$DIR/index.html"
+          elif which gnome-open > /dev/null; then
+            gnome-open "$DIR/index.html"
+          else
+            echo "Abre manualmente $DIR/index.html en tu navegador."
+          fi
+          EOF
+          chmod +x package-portable/Editor-PC-Basket-Offline/Abrir-Editor-PC-Basket.sh
+
+          # Create macOS launcher
+          cat << 'EOF' > package-portable/Editor-PC-Basket-Offline/Abrir-Editor-PC-Basket.command
+          #!/usr/bin/env bash
+          DIR="$(cd "$(dirname "$0")" && pwd)"
+          open "$DIR/index.html"
+          EOF
+          chmod +x package-portable/Editor-PC-Basket-Offline/Abrir-Editor-PC-Basket.command
+
+          # Create Local HTTP server runner (optional alternative for browsers with strict local file policies)
+          cat << 'EOF' > package-portable/Editor-PC-Basket-Offline/Servidor-Local-Opcional.bat
+          @echo off
+          title Servidor Local Editor PC Basket
+          cd /d "%~dp0"
+          echo ===================================================
+          echo   Iniciando mini-servidor local offline...
+          echo   Abre en tu navegador: http://localhost:8080
+          echo   (Cierra esta ventana para detener)
+          echo ===================================================
+          where python >nul 2>nul
+          if %ERRORLEVEL% EQU 0 (
+            python -m http.server 8080
+            goto end
+          )
+          where npx >nul 2>nul
+          if %ERRORLEVEL% EQU 0 (
+            npx serve -l 8080 .
+            goto end
+          )
+          echo [!] No se encontro Python ni Node.js.
+          echo Puedes abrir directamente "index.html" o "Abrir-Editor-PC-Basket.bat".
+          pause
+          :end
+          EOF
+
+          # Add Readme instructions for offline use
+          cat << 'EOF' > package-portable/Editor-PC-Basket-Offline/LEEME-INSTRUCCIONES.txt
+          =======================================================
+          EDITOR PC BASKET - VERSION PORTABLE / OFFLINE
+          =======================================================
+
+          Esta version funciona 100% en local y no requiere internet.
+
+          INSTRUCCIONES DE USO:
+          1. Descomprime este archivo ZIP en cualquier carpeta de tu ordenador.
+          2. En Windows: Haz doble clic en "Abrir-Editor-PC-Basket.bat" o directamente en "index.html".
+          3. En Linux: Ejecuta "./Abrir-Editor-PC-Basket.sh" o abre "index.html".
+          4. En Mac: Ejecuta "Abrir-Editor-PC-Basket.command" o abre "index.html".
+
+          NOTAS:
+          - Toda la base de datos se guarda en el almacenamiento local de tu navegador (LocalStorage).
+          - Puedes exportar equipos (.DBC) y comprimidos (.ZIP) sin conexion.
+          - Si tu navegador restringe la carga de fuentes o modulos locales (file://), ejecuta "Servidor-Local-Opcional.bat".
+          =======================================================
+          EOF
+
+          # Create the release ZIP asset
+          cd package-portable
+          zip -r ../Editor-PC-Basket-Offline-v${{ github.ref_name || 'latest' }}.zip Editor-PC-Basket-Offline
+          cd ..
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Editor-PC-Basket-Offline
+          path: Editor-PC-Basket-Offline-*.zip
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'release'
+        with:
+          files: Editor-PC-Basket-Offline-*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

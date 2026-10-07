@@ -158,7 +158,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 onResetDatabase();
               }
             }}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-2 transition-colors"
+            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"
           >
             <RotateCcw className="w-4 h-4 text-[#ffce42]" /> Restaurar Equipos ACB Clásicos
           </button>
@@ -173,10 +173,41 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 onClearDatabase();
               }
             }}
-            className="px-4 py-2 bg-rose-900/30 hover:bg-rose-900/50 text-rose-300 border border-rose-800 rounded-lg text-xs font-semibold flex items-center gap-2 transition-colors"
+            className="px-4 py-2 bg-rose-900/30 hover:bg-rose-900/50 text-rose-300 border border-rose-800 rounded-lg text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"
           >
             <Trash2 className="w-4 h-4" /> Vaciar Base de Datos
           </button>
+        </div>
+      </div>
+
+      {/* GroupBox: Modo Offline y Releases de GitHub */}
+      <div className="bg-slate-900/80 border border-indigo-500/30 rounded-2xl p-6 space-y-4 shadow-xl">
+        <div className="flex items-center space-x-2 text-indigo-400 font-bold text-sm tracking-wide border-b border-slate-800 pb-3">
+          <FolderOpen className="w-5 h-5 text-indigo-400" />
+          <span>Versión Portable Offline & GitHub Release</span>
+        </div>
+
+        <p className="text-xs text-slate-300 leading-relaxed">
+          Esta aplicación está configurada para funcionar <strong>100% de manera autónoma en local sin conexión a internet</strong>.
+          Al subir el código a GitHub y crear un Release o Tag (ej. <code className="text-amber-300 font-mono">v1.0.0</code>),
+          la acción automatizada de GitHub Actions genera y adjunta de forma automática el archivo descargable:
+        </p>
+
+        <div className="bg-slate-950 p-4 rounded-xl border border-indigo-900/50 space-y-3">
+          <div className="flex items-center justify-between text-xs font-mono">
+            <span className="text-emerald-400 font-bold flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              Editor-PC-Basket-Offline-v*.zip
+            </span>
+            <span className="text-slate-400 text-[11px] bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+              GitHub Release Asset
+            </span>
+          </div>
+          <div className="text-[12px] text-slate-300 space-y-1">
+            <p>• <strong>Incluye:</strong> Toda la aplicación web empaquetada, con rutas relativas estáticas y lanzadores para Windows (<code className="text-amber-300">.bat</code>), Linux (<code className="text-amber-300">.sh</code>) y Mac (<code className="text-amber-300">.command</code>).</p>
+            <p>• <strong>Sin conexión:</strong> Puedes abrir directamente <code className="text-amber-300">index.html</code> en tu navegador sin necesidad de servidores ni conexión a internet.</p>
+            <p>• <strong>Persistencia local:</strong> Todos tus equipos, modificaciones binarias y traspasos se guardan en el almacenamiento local de tu máquina.</p>
+          </div>
         </div>
       </div>
 
