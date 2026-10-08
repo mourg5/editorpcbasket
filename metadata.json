@@ -1,0 +1,8 @@
+{
+  "name": "Editor PC Basket - Mou",
+  "description": "Herramienta completa para editar bases de datos, equipos, jugadores, medias y ejecutables de PC Basket de Dinamic Multimedia.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
