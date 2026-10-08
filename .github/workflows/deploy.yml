@@ -1,0 +1,74 @@
+name: Build and Release
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: |
+          if [ -f "package-lock.json" ]; then
+            echo "Detected package-lock.json. Installing dependencies with npm ci..."
+            npm ci || npm install
+          elif [ -f "yarn.lock" ]; then
+            echo "Detected yarn.lock. Installing dependencies with yarn..."
+            yarn install --frozen-lockfile || yarn install
+          elif [ -f "pnpm-lock.yaml" ]; then
+            echo "Detected pnpm-lock.yaml. Enabling pnpm and installing dependencies..."
+            corepack enable || npm install -g pnpm
+            pnpm install --frozen-lockfile || pnpm install
+          else
+            echo "No lockfile detected (missing package-lock.json, yarn.lock, and pnpm-lock.yaml)."
+            echo "Generating dependencies with npm install to prevent lockfile missing errors..."
+            npm install
+          fi
+
+      - name: Build project
+        run: |
+          if [ -f "pnpm-lock.yaml" ]; then
+            pnpm run build
+          elif [ -f "yarn.lock" ]; then
+            yarn build
+          else
+            npm run build
+          fi
+
+      - name: Package dist as ZIP
+        run: |
+          cd dist
+          zip -r ../editor-pc-basket-dist.zip .
+          cd ..
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: editor-pc-basket-dist
+          path: editor-pc-basket-dist.zip
+          retention-days: 30
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'release'
+        with:
+          files: editor-pc-basket-dist.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
